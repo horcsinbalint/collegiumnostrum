@@ -17,7 +17,7 @@ class ScientificDegreeFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'name' => fake()->word(),
         ];
     }
 }
