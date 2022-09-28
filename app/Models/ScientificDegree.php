@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class ScientificDegree extends Model
 {
     use HasFactory;
+    public function alumni()
+    {
+        return $this->belongsToMany(Alumnus::class)->withTimestamps();
+    }
 }
