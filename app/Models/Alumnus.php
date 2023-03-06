@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Alumnus extends Model
 {
     use HasFactory;
-    public function courses()
+    public function majors()
     {
-        return $this->belongsToMany(Course::class)->withTimestamps();
+        return $this->belongsToMany(Major::class)->withTimestamps();
     }
 
     public function further_courses()
@@ -20,5 +20,9 @@ class Alumnus extends Model
     public function scientific_degrees()
     {
         return $this->belongsToMany(ScientificDegree::class)->withTimestamps();
+    }
+    public function research_fields()
+    {
+        return $this->belongsToMany(ResearchField::class)->withTimestamps();
     }
 }

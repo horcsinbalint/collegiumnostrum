@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ScientificDegree>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Major>
  */
-class ScientificDegreeFactory extends Factory
+class MajorFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,7 +18,6 @@ class ScientificDegreeFactory extends Factory
     {
         return [
             'name' => fake()->word(),
-            'obtain_year' => fake()->date('Y'),
         ];
     }
 }

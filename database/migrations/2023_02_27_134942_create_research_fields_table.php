@@ -13,10 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('scientific_degrees', function (Blueprint $table) {
+        Schema::create('research_fields', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->year('obtain_year')->nullable();
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('scientific_degrees');
+        Schema::dropIfExists('research_fields');
     }
 };
