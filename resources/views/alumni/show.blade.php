@@ -48,15 +48,24 @@
             </div>
             @endif
 
-            @if(isset($alumnus->university_faculty) or $alumnus->majors()->exists())
+            @if($alumnus->university_faculties()->exists() or $alumnus->majors()->exists())
             <div class="mb-2">
                 <h2>Egyetemi adatok</h2>
-                @isset($alumnus->university_faculty)
+                @if($alumnus->university_faculties()->exists())
+                    @php
+                        $university_faculties_array = Arr::flatten($alumnus->university_faculties()->select('name')->get()->makeHIdden('pivot')->toArray());
+                    @endphp
+
                     <p class="text mb-0">
                         <i class="fas fa-user"></i>
-                        <span>Egyetemi szak: {{ $alumnus->university_faculty }}</span>
+                        @if(count($university_faculties_array) > 1)
+                        <span>Egyetemi karok: {{ implode(", ", $university_faculties_array) }}</span>
+                        @else
+                        <span>Egyetemi kar: {{ implode(", ", $university_faculties_array) }}</h3></span>
+                        @endif
                     </p>
-                @endisset
+
+                @endif
 
                 @if($alumnus->majors()->exists())
                     @php
@@ -66,9 +75,9 @@
                     <p class="text mb-0">
                         <i class="fas fa-user"></i>
                         @if(count($majors_array) > 1)
-                        <span>Egyetemi karok: {{ implode(", ", $majors_array) }}</span>
+                        <span>Egyetemi szakok: {{ implode(", ", $majors_array) }}</span>
                         @else
-                        <span>Egyetemi kar: {{ implode(", ", $majors_array) }}</h3></span>
+                        <span>Egyetemi szak: {{ implode(", ", $majors_array) }}</h3></span>
                         @endif
                     </p>
                 @endif

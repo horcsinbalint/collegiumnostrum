@@ -51,8 +51,10 @@
                             <div class="card-body">
                                 {{-- TODO: Title --}}
                                 <h5 class="card-title mb-0">{{ $alumnus->name }}</h5>
+                                @isset($alumnus->birth_date)
                                 <p class="card-text mt-0">{{ $alumnus->birth_date }}</p>
-<!--
+                                @endisset
+                                <!--
                                 <p class="small mb-0">
                                     <span class="me-2">
                                         <i class="fas fa-user"></i>

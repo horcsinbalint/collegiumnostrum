@@ -88,6 +88,47 @@
         </div>
 
         <div class="form-group row mb-3">
+            <label for="university_faculties" class="col-sm-2 col-form-label py-0">Egyetemi kar</label>
+            <div class="col-sm-10">
+                {{-- TODO: Read alumnus university faculties from DB --}}
+                @forelse ($university_faculties as $faculty)
+                    <div class="form-check">
+                        <input
+                            type="checkbox"
+                            class="form-check-input"
+                            value="{{ $faculty }}"
+                            id="faculty-{{ $faculty }}"
+                            name="university_faculties[]"
+                            {{-- TODO: name, checked --}}
+
+                            @checked(
+                                is_array(old('university_faculties')) &&
+                                in_array(strval($faculty), old('university_faculties', [])))
+                            )
+                        >
+                        {{-- TODO --}}
+                        <label for="faculty-{{ $faculty }}" class="form-check-label">
+                            <span>{{ $faculty }}</span>
+                        </label>
+                    </div>
+                @empty
+                    <p>No categories found</p>
+                @endforelse
+
+                {{-- {{ in_array(strval(1), old('university_faculties', [])) }}
+                {{ json_encode( old('university_faculties', [])) }} --}}
+
+                @foreach ($errors->get('university_faculties.*') as $message)
+                    <div class="text-danger">
+                        {{ $message }}<br>
+                    </div>
+                @endforeach
+
+            </div>
+        </div>
+
+
+        <div class="form-group row mb-3">
             <label for="start_of_membership" class="col-sm-2 col-form-label">Collegiumi tagság kezdete (szakkollégiumi felvétel éve)</label>
             <div class="col-sm-10">
                 <input type="number" class="form-control @error('start_of_membership') is-invalid @enderror" id="start_of_membership" name="start_of_membership" value="{{ old('start_of_membership') }}">

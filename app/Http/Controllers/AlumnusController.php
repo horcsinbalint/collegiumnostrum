@@ -3,7 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alumnus;
+use \App\Models\UniversityFaculty;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Arr;
 
 class AlumnusController extends Controller
 {
@@ -15,7 +21,7 @@ class AlumnusController extends Controller
     public function index()
     {
         return view('alumni.index', [
-            'alumni' => \App\Models\Alumnus::paginate(10),
+            'alumni' => Alumnus::paginate(10),
         ]);
     }
 
@@ -28,7 +34,7 @@ class AlumnusController extends Controller
     {
         // TODO: kar, szak, stb. átadása
         return view('alumni.create', [
-            ''
+            'university_faculties' => UniversityFaculty::$university_faculties_enum,
         ]);
     }
 
@@ -40,7 +46,7 @@ class AlumnusController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO: kar, szak stb.
+        // TODO: kar, szak stb. mentése
         $validated = $request->validate(
             [
                 'name' => 'required|min:3',
@@ -55,10 +61,10 @@ class AlumnusController extends Controller
                 'research_field_detailed' => 'nullable|max:255',
                 'links' => 'nullable|max:255',
                 'works' => 'nullable|max:255',
+                'university_faculties' => 'nullable|array',
             ]
         );
 
-        // TODO: id?
         $alumnus = Alumnus::factory()->create([
             'name' => $validated['name'],
             'email' => $validated['email'],
@@ -74,7 +80,23 @@ class AlumnusController extends Controller
             'works' => $validated['works'],
         ]);
 
-        Session::flash('alumnus_created', $alumnus->name);
+        // University faculty
+        // olyan unifaculty létrehozása, ami még nincs, a többi id lekérése database-ből és szinkronizálás
+        $existing_university_faculties = Arr::flatten(UniversityFaculty::select('name')->get()->makeHIdden('pivot')->toArray());
+        $missing_university_faculties = array_diff($validated['university_faculties'], $existing_university_faculties);
+        foreach ($missing_university_faculties as $faculty) {
+            UniversityFaculty::factory()->create([
+                'name' => $faculty
+            ]);
+        }
+        $university_faculty_ids = Arr::flatten(UniversityFaculty::select('id')->whereIn('name', $validated['university_faculties'])->get()->makeHIdden('pivot')->toArray());
+        if (isset($validated["university_faculties"])) {
+            $alumnus->university_faculties()->sync($university_faculty_ids);
+        }
+
+        // TODO: a többi
+
+        // Session::flash('alumnus_created', $alumnus->name);
 
         // TODO: rather index?
         return Redirect::route('alumni.show', $alumnus);
