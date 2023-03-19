@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('birth_place')->nullable();
             $table->string('high_school')->nullable();
             $table->year('graduation_date')->nullable();
-            $table->string('university_faculty')->nullable();
             $table->text('further_course_detailed')->nullable();
             $table->year('start_of_membership')->nullable();
             $table->text('recognations')->nullable();
@@ -32,7 +31,7 @@ return new class extends Migration
 
 
             // Kapcsoló tábla: major, further_course, scientific_degree, research_field
-            // TODO: research_field
+            // TODO: university_faculty table
             $table->timestamps();
         });
     }

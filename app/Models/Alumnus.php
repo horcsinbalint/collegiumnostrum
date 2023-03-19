@@ -12,7 +12,6 @@ class Alumnus extends Model
     {
         return $this->belongsToMany(Major::class)->withTimestamps();
     }
-
     public function further_courses()
     {
         return $this->belongsToMany(FurtherCourse::class)->withTimestamps();
@@ -24,5 +23,9 @@ class Alumnus extends Model
     public function research_fields()
     {
         return $this->belongsToMany(ResearchField::class)->withTimestamps();
+    }
+    public function university_faculties()
+    {
+        return $this->belongsToMany(UniversityFaculty::class)->withTimestamps();
     }
 }
