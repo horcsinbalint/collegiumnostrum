@@ -18,6 +18,17 @@
     </div>
 
     {{-- TODO: Session flashes --}}
+    @if (Session::has('alumnus_created'))
+        <div class="alert alert-success" role="alert">
+            {{ Session::get('alumnus_created') }} hozzáadva!
+        </div>
+    @endif
+
+    @if (Session::has('alumnus_deleted'))
+        <div class="alert alert-success" role="alert">
+            {{ Session::get('alumnus_deleted') }} törölve az adatbázisból!
+        </div>
+    @endif
 
     <div class="row mt-3">
     <div class="col-12 col-lg-12">

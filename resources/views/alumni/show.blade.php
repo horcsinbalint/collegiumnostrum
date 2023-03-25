@@ -6,6 +6,11 @@
 <div class="container">
 
     {{-- TODO: Session flashes --}}
+    @if (Session::has('alumnus_created'))
+        <div class="alert alert-success" role="alert">
+            {{ Session::get('alumnus_created') }} hozzáadva!
+        </div>
+    @endif
 
     <a href="{{ route('alumni.index') }}"><i class="fas fa-long-arrow-alt-left"></i> Vissza a kezdőlapra</a>
 
@@ -176,7 +181,7 @@
             <div class="float-lg-end">
 
                 {{-- TODO: Links, policy --}}
-                <a role="button" class="btn btn-sm btn-primary" href="#"><i class="far fa-edit"></i> Szerkesztés</a>
+                <a role="button" class="btn btn-sm btn-primary" href="{{ route('alumni.edit', $alumnus) }}"><i class="far fa-edit"></i> Szerkesztés</a>
 
                 <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#delete-confirm-modal"><i class="far fa-trash-alt">
                     <span></i> Törlés</span>
@@ -195,8 +200,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    {{-- TODO: Title --}}
-                    Biztosan törölni szeretné a következő személyt az adatbázisból: <strong>{{ $alumnus->name }} </strong>?
+                    Biztosan törölni szeretné a következő személyt az adatbázisból: <strong>{{ $alumnus->name }}</strong>?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Mégse</button>
@@ -208,7 +212,6 @@
                         Igen, törlés
                     </button>
 
-                    {{-- TODO: Route, directives --}}
                     <form id="delete-post-form" action="#" method="POST" class="d-none">
                         @method('DELETE')
                         @csrf

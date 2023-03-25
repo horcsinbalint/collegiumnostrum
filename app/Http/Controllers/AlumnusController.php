@@ -53,7 +53,6 @@ class AlumnusController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO: kar, szak stb. mentése
         $validated = $request->validate(
             [
                 'name' => 'required|min:3',
@@ -170,7 +169,7 @@ class AlumnusController extends Controller
             $alumnus->research_fields()->sync($ids);
         }
 
-        // Session::flash('alumnus_created', $alumnus->name);
+        Session::flash('alumnus_created', $alumnus->name);
 
         // TODO: rather index?
         return Redirect::route('alumni.show', $alumnus);
@@ -188,6 +187,7 @@ class AlumnusController extends Controller
         return view('alumni.show', [
             'alumnus' => $alumnus,
         ]);
+
     }
 
     /**
@@ -198,7 +198,15 @@ class AlumnusController extends Controller
      */
     public function edit(Alumnus $alumnus)
     {
-        //
+        return view('alumni.edit', [
+            'university_faculties' => UniversityFaculty::$university_faculties_enum,
+            'majors' => Major::$majors_enum,
+            'further_courses' => FurtherCourse::$further_courses_enum,
+            'scientific_degrees' => ScientificDegree::$scientific_degrees_enum,
+            'research_fields' => ResearchField::$research_fields_enum,
+            'alumnus' => $alumnus,
+        ]);
+
     }
 
     /**
@@ -210,7 +218,66 @@ class AlumnusController extends Controller
      */
     public function update(Request $request, Alumnus $alumnus)
     {
-        //
+        // TODO: scientific degree and years somehow and in the seader create every field!!
+        $validated = $request->validate(
+            [
+                'name' => 'required|min:3',
+                'email' => 'nullable|email',
+                'birth_date' => 'nullable|numeric|gt:1930',
+                'birth_place' => 'nullable|min:3',
+                'high_school' => 'nullable|min:3',
+                'graduation_date' => 'nullable|numeric|gt:1930',
+                'further_course_detailed' => 'nullable|max:255',
+                'start_of_membership' => 'nullable|numeric|gt:1930',
+                'recognations' => 'nullable|max:255',
+                'research_field_detailed' => 'nullable|max:255',
+                'links' => 'nullable|max:255',
+                'works' => 'nullable|max:255',
+                'university_faculties' => 'nullable|array',
+                'majors' => 'nullable|array',
+                'further_courses' => 'nullable|array',
+                'scientific_degrees' => 'nullable|array',
+                'research_fields' => 'nullable|array',
+            ]
+        );
+
+        $alumnus->name = $validated['name'];
+        $alumnus->email = $validated['email'];
+        $alumnus->birth_date = $validated['birth_date'];
+        $alumnus->birth_place = $validated['birth_place'];
+        $alumnus->high_school = $validated['high_school'];
+        $alumnus->graduation_date = $validated['graduation_date'];
+        $alumnus->further_course_detailed = $validated['further_course_detailed'];
+        $alumnus->start_of_membership = $validated['start_of_membership'];
+        $alumnus->recognations = $validated['recognations'];
+        $alumnus->research_field_detailed = $validated['research_field_detailed'];
+        $alumnus->links = $validated['links'];
+        $alumnus->works = $validated['works'];
+        //$alumnus->scientific_degrees = $validated['scientific_degrees'];
+        $alumnus->save();
+
+        if (isset($validated["university_faculties"])) {
+            $ids = UniversityFaculty::all()->whereIn('name', $validated['university_faculties'])->pluck('id')->toArray();
+            $alumnus->university_faculties()->sync($ids);
+        }
+
+        if (isset($validated["majors"])) {
+            $ids = UniversityFaculty::all()->whereIn('name', $validated['majors'])->pluck('id')->toArray();
+            $alumnus->majors()->sync($ids);
+        }
+
+        if (isset($validated["further_courses"])) {
+            $ids = UniversityFaculty::all()->whereIn('name', $validated['further_courses'])->pluck('id')->toArray();
+            $alumnus->further_courses()->sync($ids);
+        }
+
+        if (isset($validated["research_fields"])) {
+            $ids = UniversityFaculty::all()->whereIn('name', $validated['research_fields'])->pluck('id')->toArray();
+            $alumnus->research_fields()->sync($ids);
+        }
+
+        Session::flash('alumnus_updated');
+        return Redirect::route('alumni.show', $alumnus);
     }
 
     /**
@@ -221,6 +288,10 @@ class AlumnusController extends Controller
      */
     public function destroy(Alumnus $alumnus)
     {
-        //
+        // TODO: authorize
+        $alumnus->delete();
+        Session::flash('alumnus_deleted', $alumnus->name);
+        return Redirect::route('alumni.index');
+
     }
 }
