@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Alumnus;
 use \App\Models\UniversityFaculty;
+use \App\Models\ResearchField;
+use \App\Models\FurtherCourse;
+use \App\Models\Major;
+use \App\Models\ScientificDegree;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
@@ -32,9 +36,12 @@ class AlumnusController extends Controller
      */
     public function create()
     {
-        // TODO: kar, szak, stb. átadása
         return view('alumni.create', [
             'university_faculties' => UniversityFaculty::$university_faculties_enum,
+            'majors' => Major::$majors_enum,
+            'further_courses' => FurtherCourse::$further_courses_enum,
+            'scientific_degrees' => ScientificDegree::$scientific_degrees_enum,
+            'research_fields' => ResearchField::$research_fields_enum,
         ]);
     }
 
@@ -62,6 +69,16 @@ class AlumnusController extends Controller
                 'links' => 'nullable|max:255',
                 'works' => 'nullable|max:255',
                 'university_faculties' => 'nullable|array',
+                'majors' => 'nullable|array',
+                'further_courses' => 'nullable|array',
+                'scientific_degrees' => 'nullable|array',
+                'research_fields' => 'nullable|array',
+                'dla_year' => 'nullable|numeric|gt:1930',
+                'hab_year' => 'nullable|numeric|gt:1930',
+                'mta_year' => 'nullable|numeric|gt:1930',
+                'candidate_year' => 'nullable|numeric|gt:1930',
+                'doctor_year' => 'nullable|numeric|gt:1930',
+                'phd_year' => 'nullable|numeric|gt:1930',
             ]
         );
 
@@ -82,19 +99,76 @@ class AlumnusController extends Controller
 
         // University faculty
         // olyan unifaculty létrehozása, ami még nincs, a többi id lekérése database-ből és szinkronizálás
-        $existing_university_faculties = Arr::flatten(UniversityFaculty::select('name')->get()->makeHIdden('pivot')->toArray());
-        $missing_university_faculties = array_diff($validated['university_faculties'], $existing_university_faculties);
-        foreach ($missing_university_faculties as $faculty) {
-            UniversityFaculty::factory()->create([
-                'name' => $faculty
-            ]);
-        }
-        $university_faculty_ids = Arr::flatten(UniversityFaculty::select('id')->whereIn('name', $validated['university_faculties'])->get()->makeHIdden('pivot')->toArray());
         if (isset($validated["university_faculties"])) {
+            $existing_university_faculties = Arr::flatten(UniversityFaculty::select('name')->get()->makeHIdden('pivot')->toArray());
+            $missing_university_faculties = array_diff($validated['university_faculties'], $existing_university_faculties);
+            foreach ($missing_university_faculties as $faculty) {
+                UniversityFaculty::factory()->create([
+                    'name' => $faculty
+                ]);
+            }
+            $university_faculty_ids = Arr::flatten(UniversityFaculty::select('id')->whereIn('name', $validated['university_faculties'])->get()->makeHIdden('pivot')->toArray());
             $alumnus->university_faculties()->sync($university_faculty_ids);
         }
 
-        // TODO: a többi
+        // Major
+        if (isset($validated["majors"])) {
+            $existing_majors = Arr::flatten(Major::select('name')->get()->makeHIdden('pivot')->toArray());
+            $missing_majors = array_diff($validated['majors'], $existing_majors);
+            foreach ($missing_majors as $major) {
+                Major::factory()->create([
+                    'name' => $major
+                ]);
+            }
+            $major_ids = Arr::flatten(Major::select('id')->whereIn('name', $validated['majors'])->get()->makeHIdden('pivot')->toArray());
+            $alumnus->majors()->sync($major_ids);
+        }
+
+        // Further courses
+        if (isset($validated["further_courses"])) {
+            $existing_further_courses = Arr::flatten(FurtherCourse::select('name')->get()->makeHIdden('pivot')->toArray());
+            $missing_further_courses = array_diff($validated['further_courses'], $existing_further_courses);
+            foreach ($missing_further_courses as $further_course) {
+                FurtherCourse::factory()->create([
+                    'name' => $further_course
+                ]);
+            }
+            $ids = Arr::flatten(FurtherCourse::select('id')->whereIn('name', $validated['further_courses'])->get()->makeHIdden('pivot')->toArray());
+            $alumnus->further_courses()->sync($ids);
+        }
+
+        // Scientific degree
+        if (isset($validated["scientific_degrees"])) {
+            $ids = [];
+            foreach ($validated["scientific_degrees"] as $scientific_degree) {
+                $degree = ScientificDegree::factory()->create([
+                    'name' => $scientific_degree,
+                    'obtain_year' => (
+                            isset($validated['doctor_year']) && strcmp($scientific_degree, 'egyetemi doktor') == 0 ? $validated['doctor_year'] :
+                            (isset($validated['candidate_year']) && strcmp($scientific_degree, 'kandidátus') == 0 ? $validated['candidate_year'] :
+                            (isset($validated['mta_year']) && strcmp($scientific_degree, 'tudományok doktora/MTA doktora') == 0 ? $validated['mta_year'] :
+                            (isset($validated['hab_year']) && strcmp($scientific_degree, 'habilitáció') == 0 ? $validated['hab_year'] :
+                            (isset($validated['phd_year']) && strcmp($scientific_degree, 'PhD') == 0 ? $validated['phd_year'] :
+                            (isset($validated['dla_year']) && strcmp($scientific_degree, 'DLA') == 0 ? $validated['dla_year'] : null)))))
+                        )
+                ]);
+                array_push($ids,$degree->id);
+            }
+            $alumnus->scientific_degrees()->sync($ids);
+        }
+
+        // Research fields
+        if (isset($validated["research_fields"])) {
+            $existing_research_fields = Arr::flatten(ResearchField::select('name')->get()->makeHIdden('pivot')->toArray());
+            $missing_research_fields = array_diff($validated['research_fields'], $existing_research_fields);
+            foreach ($missing_research_fields as $research_field) {
+                ResearchField::factory()->create([
+                    'name' => $research_field
+                ]);
+            }
+            $ids = Arr::flatten(ResearchField::select('id')->whereIn('name', $validated['research_fields'])->get()->makeHIdden('pivot')->toArray());
+            $alumnus->research_fields()->sync($ids);
+        }
 
         // Session::flash('alumnus_created', $alumnus->name);
 

@@ -114,7 +114,7 @@
                     @foreach ($alumnus->scientific_degrees as $degree)
                     <p class="text mb-0">
                         <i class="fas fa-user"></i>
-                        <span>{{ $degree->name . (isset($degree->year) ? " (" . $degree->year . ")" : "") }}</span>
+                        <span>{{ $degree->name . (isset($degree->obtain_year) ? " (" . $degree->obtain_year . ")" : "") }}</span>
                     </p>
                     @endforeach
                 @endif
