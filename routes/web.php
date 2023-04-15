@@ -20,6 +20,8 @@ Route::get('/', function () {
 });
 
 Route::resource('alumni', AlumnusController::class);
+Route::get('/alumni/import/create', [AlumnusController::class, 'import_create'])->name('alumni.import.create');
+Route::post('/alumni/import', [AlumnusController::class, 'import_store'])->name('alumni.import.store');
 
 
 // -----------------------------------------

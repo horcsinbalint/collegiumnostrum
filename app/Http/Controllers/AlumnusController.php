@@ -33,6 +33,16 @@ class AlumnusController extends Controller
     }
 
     /**
+     * Show the form for importing new alumni from a spreadsheet file.
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function import_create()
+    {
+        return view('alumni.import', ['']);
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -78,6 +88,30 @@ class AlumnusController extends Controller
 
         // TODO: rather index?
         return Redirect::route('alumni.show', $alumnus);
+    }
+
+    public function import_store(Request $request)
+    {
+        $request->validate(
+            [
+                'file' =>  'file',
+            ]
+        );
+        
+        $file = $request->file('file');
+        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader('Ods'); //TODO: check extension and select based on it
+        $reader->setReadDataOnly(true); //we don't care about formatting
+        //TODO: ReadFilter for only the cells in the appropriate rows?
+        $spreadsheet = $reader->load($file->getRealPath());
+
+        return response()->json($spreadsheet->getActiveSheet()
+        ->rangeToArray(
+            'A1:P1',     // The worksheet range that we want to retrieve
+            NULL,        // Value that should be returned for empty cells
+            TRUE,        // Should formulas be calculated (the equivalent of getCalculatedValue() for each cell)
+            TRUE,        // Should values be formatted (the equivalent of getFormattedValue() for each cell)
+            TRUE         // Should the array be indexed by cell row and cell column
+        ));
     }
 
     /**
