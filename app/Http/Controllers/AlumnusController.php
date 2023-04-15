@@ -103,15 +103,22 @@ class AlumnusController extends Controller
         $reader->setReadDataOnly(true); //we don't care about formatting
         //TODO: ReadFilter for only the cells in the appropriate rows?
         $spreadsheet = $reader->load($file->getRealPath());
+        $worksheet = $spreadsheet->getActiveSheet();
 
-        return response()->json($spreadsheet->getActiveSheet()
-        ->rangeToArray(
-            'A1:P1',     // The worksheet range that we want to retrieve
-            NULL,        // Value that should be returned for empty cells
-            TRUE,        // Should formulas be calculated (the equivalent of getCalculatedValue() for each cell)
-            TRUE,        // Should values be formatted (the equivalent of getFormattedValue() for each cell)
-            TRUE         // Should the array be indexed by cell row and cell column
-        ));
+        //maybe this into a separate function?
+        $highestRow = $worksheet->getHighestRow();
+        $tojson=array();
+        for ($i = 2; $i <= $highestRow; ++$i) //indexing starts from 1 here
+        {
+            $tojson[] = $worksheet->rangeToArray( //appending it to the end
+                "A$i:P$i",     // The worksheet range that we want to retrieve
+                NULL,        // Value that should be returned for empty cells
+                TRUE,        // Should formulas be calculated (the equivalent of getCalculatedValue() for each cell)
+                TRUE,        // Should values be formatted (the equivalent of getFormattedValue() for each cell)
+                TRUE         // Should the array be indexed by cell row and cell column
+            )[$i]; //it would otherwise add an extra dimension
+        }
+        return response()->json($tojson);
     }
 
     /**
