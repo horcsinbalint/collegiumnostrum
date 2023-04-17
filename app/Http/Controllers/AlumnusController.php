@@ -115,6 +115,14 @@ class AlumnusController extends Controller
         return $arr;
     }
 
+    /**Maps extensions to PhpSpreadsheet's file descriptors. */
+    const EXTENSION_TO_DESCRIPTOR = [
+        'txt' => 'Csv', //Laravel recognizes csv files as txt
+        'ods' => 'Ods',
+        'xls' => 'Xls',
+        'xlsx' => 'Xlsx'
+    ];
+
     /**
      * Handles a request with an uploaded worksheet file that contains more than one alumni.
      * Extracts the data and stores it in new Alumnus objects.
@@ -135,7 +143,15 @@ class AlumnusController extends Controller
         {
             return redirect()->back()->with('message', 'Nincs kiválasztva fájl.');
         }
-        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader('Ods'); //TODO: check extension and select based on it
+
+        $extension = $file->extension(); //Laravel guesses the extension based on file content
+        if (!isset( AlumnusController::EXTENSION_TO_DESCRIPTOR[$extension] )) {
+            return redirect()->back()->with('error', 'Nem támogatott fájlformátum.');
+        }
+
+        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader(
+            AlumnusController::EXTENSION_TO_DESCRIPTOR[$extension]
+        );
         $reader->setReadDataOnly(true); //we don't care about formatting
         //maybe a ReadFilter for only the cells in the appropriate columns?
         $spreadsheet = $reader->load($file->getRealPath());

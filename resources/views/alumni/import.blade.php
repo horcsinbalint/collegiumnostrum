@@ -16,9 +16,11 @@
         @csrf
 
         {{-- TODO: Validation --}}
-        <label for="file">Fájl feltöltése (támogatott típusok: .xlsx, .ods, .csv):</label>
+        <label for="file">Fájl feltöltése (támogatott típusok: .xlsx, .xls, .ods):</label>
         <input type="file" id="file" name="file"
-          accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.oasis.opendocument.spreadsheet,
+          accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+                  application/vnd.ms-excel,
+                  application/vnd.oasis.opendocument.spreadsheet,
                   text/csv" />
 
         <div class="text-center">
