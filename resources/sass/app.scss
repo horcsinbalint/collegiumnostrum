@@ -4,3 +4,48 @@
 
 // Font Awesome ikonkészlet
 @import url('@fortawesome/fontawesome-free/css/all.css');
+
+body {
+    background-color: #2f251a;
+}
+
+body > div {
+    background-color: white;
+}
+
+.header-banner-image {
+    height: 75px;
+    padding-bottom: 0;
+    padding-top: 0;
+    margin-top: 2px;
+}
+
+.banner-container {
+    display: block;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.footer-wrapper {
+    background-color: #2f251a;
+    color: white !important;
+}
+
+.footer-link {
+    background-color: #2f251a;
+    color: white !important;
+    text-decoration: none;
+}
+
+nav > .flex.justify-between.flex-1 {
+    visibility: hidden;
+}
+
+.w-5 {
+    height: 10px;
+    width: 10px;
+}
+.h-5 {
+    height: 10px;
+    width: 10px;
+}

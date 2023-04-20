@@ -16,10 +16,19 @@
     </title>
 
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    <style>
+
+        </style>
 </head>
 <body>
     <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+    <div class="col-xs-12 banner-container hidden-md" style="height: 107px">
+
+        <a href="/">
+            <img class="header-banner-image" src="/images/eotvoscoll-nagy.svg" alt="ugrás a főoldalra">
+            <img src="https://eotvos.elte.hu/media/da/30/e9a7dd3606d1cf1b44a674b6b3f4d7b52638a8a0cdc56526c14c0010e4c0/ec_logo.png" class="header-banner-image">
+        </div>
+        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm" style="background-color:#bc9632!important">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
                     {{ config('Collegium Nostrum', 'Collegium Nostrum') }}
@@ -80,7 +89,7 @@
             @yield('content')
         </main>
 
-        <footer class="mb-4">
+        <footer class="mb-4 footer-wrapper">
             <div class="container">
                 <hr>
                 <div class="d-flex flex-column align-items-center">
@@ -93,7 +102,7 @@
                     </div>
 
                     <div>
-                        <span class="small"><a href="https://eotvos.elte.hu/">Eötvös József Collegium</a></span>
+                        <span class="small"><a href="https://eotvos.elte.hu/" class="footer-link">Eötvös József Collegium</a></span>
                     </div>
                 </div>
             </div>
