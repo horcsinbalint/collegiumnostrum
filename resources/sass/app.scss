@@ -5,8 +5,13 @@
 // Font Awesome ikonkészlet
 @import url('@fortawesome/fontawesome-free/css/all.css');
 
+$bottom-brown: #2f251a;
+$top-bread: #bc9632;
+$action-button: #d4942f;
+$action-button-hover: #9a6716;
+
 body {
-    background-color: #2f251a;
+    background-color: $bottom-brown;
 }
 
 body > div {
@@ -25,12 +30,33 @@ body > div {
 }
 
 .footer-wrapper {
-    background-color: #2f251a;
+    background-color: $bottom-brown;
     color: white;
 }
 
 .footer-link {
-    background-color: #2f251a;
+    background-color: $bottom-brown;
     color: white !important;
     text-decoration: none;
+}
+
+
+.nav-link{
+    color: black !important;
+}
+
+.top-bar{
+    background-color: $top-bread!important;
+}
+
+.btn-success {
+    background-color: $action-button;
+    border: var(--bs-btn-border-width) solid $action-button-hover;
+    color: black;
+}
+
+.btn-success:hover {
+    background-color: $action-button-hover;
+    border: var(--bs-btn-border-width) solid $action-button-hover;
+    color: black;
 }

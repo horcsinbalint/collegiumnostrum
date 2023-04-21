@@ -27,7 +27,7 @@
         <a href="/">
             <img class="header-banner-image" src="/images/eotvoscoll-nagy.svg" alt="ugrás a főoldalra"><img src="https://eotvos.elte.hu/media/da/30/e9a7dd3606d1cf1b44a674b6b3f4d7b52638a8a0cdc56526c14c0010e4c0/ec_logo.png" class="header-banner-image">
         </div>
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm" style="background-color:#bc9632!important">
+        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm top-bar">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
                     {{ config('Collegium Nostrum', 'Collegium Nostrum') }}
@@ -45,6 +45,7 @@
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
+                            {{-- TODO: rename option, since this does not link to the home page --}}
                             <a class="nav-link" href="{{ route('alumni.index') }}">{{ __('Kezdőlap') }}</a>
                         </li>
                         <!-- Authentication Links -->
