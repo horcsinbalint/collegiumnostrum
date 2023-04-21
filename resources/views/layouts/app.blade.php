@@ -25,8 +25,7 @@
     <div class="col-xs-12 banner-container hidden-md" style="height: 107px">
 
         <a href="/">
-            <img class="header-banner-image" src="/images/eotvoscoll-nagy.svg" alt="ugrás a főoldalra">
-            <img src="https://eotvos.elte.hu/media/da/30/e9a7dd3606d1cf1b44a674b6b3f4d7b52638a8a0cdc56526c14c0010e4c0/ec_logo.png" class="header-banner-image">
+            <img class="header-banner-image" src="/images/eotvoscoll-nagy.svg" alt="ugrás a főoldalra"><img src="https://eotvos.elte.hu/media/da/30/e9a7dd3606d1cf1b44a674b6b3f4d7b52638a8a0cdc56526c14c0010e4c0/ec_logo.png" class="header-banner-image">
         </div>
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm" style="background-color:#bc9632!important">
             <div class="container">
