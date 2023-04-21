@@ -22,7 +22,7 @@
 </head>
 <body>
     <div id="app">
-    <div class="col-xs-12 banner-container hidden-md" style="height: 107px">
+    <div class="col-xs-12 banner-container hidden-md">
 
         <a href="/">
             <img class="header-banner-image" src="/images/eotvoscoll-nagy.svg" alt="ugrás a főoldalra"><img src="https://eotvos.elte.hu/media/da/30/e9a7dd3606d1cf1b44a674b6b3f4d7b52638a8a0cdc56526c14c0010e4c0/ec_logo.png" class="header-banner-image">
