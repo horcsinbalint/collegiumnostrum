@@ -97,7 +97,7 @@
 
             <div class="d-flex justify-content-center">
                 {{-- TODO: Pagination --}}
-                {{ $alumni->links() }}
+                {{ $alumni->links('pagination::bootstrap-4') }}
             </div>
 
         </div>
