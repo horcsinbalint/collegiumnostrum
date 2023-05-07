@@ -20,6 +20,8 @@ Route::get('/', function () {
 });
 
 Route::resource('alumni', AlumnusController::class);
+Route::post('/alumni/{alumnus}/accept', [AlumnusController::class, 'accept'])->name('alumni.accept');
+Route::post('/alumni/{alumnus}/reject', [AlumnusController::class, 'reject'])->name('alumni.reject');
 
 
 // -----------------------------------------

@@ -19,9 +19,9 @@ return new class extends Migration
             $table->unsignedBigInteger('university_faculty_id');
             $table->timestamps();
 
-            $table->unique(['alumnus_id', 'university_faculty_id']);
-            $table->foreign('alumnus_id')->references('id')->on('alumni')->onDelete('cascade');
-            $table->foreign('university_faculty_id')->references('id')->on('university_faculties')->onDelete('cascade');
+            $table->unique(['alumnus_id', 'university_faculty_id'], 'alumnus_university_faculty_unique');
+            $table->foreign('alumnus_id', 'alumnus_fk')->references('id')->on('alumni')->onDelete('cascade');
+            $table->foreign('university_faculty_id', 'university_faculty_fk')->references('id')->on('university_faculties')->onDelete('cascade');
         });
     }
 
