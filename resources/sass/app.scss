@@ -9,8 +9,9 @@ $bottom-brown: #2f251a;
 $top-bread: #bc9632;
 $action-button: #d4942f;
 $action-button-hover: #9a6716;
-//$coli-blue: #242851;
-$coli-blue: #b38f2f; //TODO: rename
+
+$danger-button: #bd5900;
+$danger-button-hover: #8b4100;
 
 body {
     background-color: $bottom-brown;
@@ -51,19 +52,26 @@ body > div {
     background-color: $top-bread!important;
 }
 
-.btn-success, .btn-success:active, .btn-success:visited {
+.btn-success, .btn-success:active, .btn-success:visited, .btn-primary, .btn-primary:active, .btn-primary:visited {
     background-color: $action-button!important;
     border: var(--bs-btn-border-width) solid $action-button-hover;
-    color: black!important;
+    color: white!important;
 }
 
-.btn-success:hover {
+.btn-primary:hover, .btn-success:hover {
     background-color: $action-button-hover!important;
     border: var(--bs-btn-border-width) solid $action-button-hover;
-    color: black!important;
+    color: white!important;
 }
 
-.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
-    background-color: $coli-blue!important;
-    border: var(--bs-btn-border-width) solid $coli-blue!important;
+.btn-danger, .btn-danger:active, .btn-danger:visited {
+    background-color: $danger-button!important;
+    border: var(--bs-btn-border-width) solid $danger-button-hover;
+    color: white!important;
+}
+
+.btn-danger:hover {
+    background-color: $danger-button-hover!important;
+    border: var(--bs-btn-border-width) solid $danger-button-hover;
+    color: white!important;
 }
