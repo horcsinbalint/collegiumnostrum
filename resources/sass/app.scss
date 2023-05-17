@@ -9,6 +9,8 @@ $bottom-brown: #2f251a;
 $top-bread: #bc9632;
 $action-button: #d4942f;
 $action-button-hover: #9a6716;
+//$coli-blue: #242851;
+$coli-blue: #b38f2f; //TODO: rename
 
 body {
     background-color: $bottom-brown;
@@ -49,14 +51,19 @@ body > div {
     background-color: $top-bread!important;
 }
 
-.btn-success {
-    background-color: $action-button;
+.btn-success, .btn-success:active, .btn-success:visited {
+    background-color: $action-button!important;
     border: var(--bs-btn-border-width) solid $action-button-hover;
-    color: black;
+    color: black!important;
 }
 
 .btn-success:hover {
-    background-color: $action-button-hover;
+    background-color: $action-button-hover!important;
     border: var(--bs-btn-border-width) solid $action-button-hover;
-    color: black;
+    color: black!important;
+}
+
+.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
+    background-color: $coli-blue!important;
+    border: var(--bs-btn-border-width) solid $coli-blue!important;
 }
