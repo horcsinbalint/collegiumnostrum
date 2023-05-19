@@ -578,6 +578,26 @@ class AlumnusController extends Controller
             $ids = ResearchField::all()->whereIn('name', $validated['research_fields'])->pluck('id')->toArray();
             $alumnus->research_fields()->sync($ids);
         }
+
+        // Scientific degree
+        if (isset($validated["scientific_degrees"])) {
+            $ids = [];
+            foreach ($validated["scientific_degrees"] as $scientific_degree) {
+                $degree = ScientificDegree::factory()->create([
+                    'name' => $scientific_degree,
+                    'obtain_year' => (
+                            isset($validated['doctor_year']) && strcmp($scientific_degree, 'egyetemi doktor') == 0 ? $validated['doctor_year'] :
+                            (isset($validated['candidate_year']) && strcmp($scientific_degree, 'kandidátus') == 0 ? $validated['candidate_year'] :
+                            (isset($validated['mta_year']) && strcmp($scientific_degree, 'tudományok doktora/MTA doktora') == 0 ? $validated['mta_year'] :
+                            (isset($validated['hab_year']) && strcmp($scientific_degree, 'habilitáció') == 0 ? $validated['hab_year'] :
+                            (isset($validated['phd_year']) && strcmp($scientific_degree, 'PhD') == 0 ? $validated['phd_year'] :
+                            (isset($validated['dla_year']) && strcmp($scientific_degree, 'DLA') == 0 ? $validated['dla_year'] : null)))))
+                        )
+                ]);
+                array_push($ids,$degree->id);
+            }
+            $alumnus->scientific_degrees()->sync($ids);
+        }
     }
 
     /**
@@ -596,7 +616,7 @@ class AlumnusController extends Controller
         //   they are guests, or
         //   they are registered and cannot create non-draft entries but can create drafts
         if((!$user) || !$user->can('update', $alumnus)) {
-            
+
             $this->authorize('createDraftFor', $alumnus); //this also ensures $alumnus is not a draft
 
             $draftAlumnus = AlumnusController::validateAndStore($request, true, $alumnus->id);
@@ -625,7 +645,7 @@ class AlumnusController extends Controller
                 'works' => $validated['works'],
             ]);
             AlumnusController::synchroniseConnections($alumnus, $validated);
-            
+
             Session::flash('alumnus_updated', $alumnus->name);
             return Redirect::route('alumni.show', $alumnus);
         }
@@ -635,7 +655,7 @@ class AlumnusController extends Controller
      * Accept a draft created from outside.
      * Changes the id to the original's id, then deletes the original.
      * If there is no original, it simply changes the is_draft bit to false.
-     * 
+     *
      * @param  \App\Models\Alumnus  $alumnus
      * @return \Illuminate\Http\Response
      */
@@ -653,7 +673,7 @@ class AlumnusController extends Controller
 
             $originalPair->delete();
 
-            $alumnus->id = $originalPairId;
+            $alumnus->id = $originalPairId; //because of onUpdate('cascade'), this will update the connection tables, too
             $alumnus->save();
         } else { //if it is null
             $alumnus->is_draft = false;
@@ -666,7 +686,7 @@ class AlumnusController extends Controller
 
     /**
      * Reject a draft created from outside. Simply deletes the draft.
-     * 
+     *
      * @param  \App\Models\Alumnus  $alumnus
      * @return \Illuminate\Http\Response
      */
