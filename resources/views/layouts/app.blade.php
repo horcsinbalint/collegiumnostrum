@@ -15,6 +15,8 @@
         {{ config('app.name', 'Collegium Nostrum') }}
     </title>
 
+    @include('shared.toast')
+
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <style>
 
