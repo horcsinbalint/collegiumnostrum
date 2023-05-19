@@ -27,7 +27,7 @@ class AlumnusFactory extends Factory
             'start_of_membership' => fake()->date('Y'),
             'recognations' => fake()->sentence(5),
             'research_field_detailed' => fake()->paragraphs(rand(2,8), true),
-            'agreed' => false,
+            'agreed' => true,
             'links' => fake()->url() . '\n' . fake()->url(),
             'works' => fake()->sentence(3),
             'is_draft' => false,
