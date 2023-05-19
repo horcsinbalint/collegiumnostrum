@@ -15,8 +15,6 @@
         {{ config('app.name', 'Collegium Nostrum') }}
     </title>
 
-    @include('shared.toast')
-
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <style>
 
@@ -47,8 +45,10 @@
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            {{-- TODO: rename option, since this does not link to the home page --}}
-                            <a class="nav-link" href="{{ route('alumni.index') }}">{{ __('Kezdőlap') }}</a>
+                            <a class="nav-link" href="{{ url('/') }}">{{ __('Kezdőlap') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('alumni.index') }}">{{ __('Alumni adatbázis') }}</a>
                         </li>
                         <!-- Authentication Links -->
                         @guest

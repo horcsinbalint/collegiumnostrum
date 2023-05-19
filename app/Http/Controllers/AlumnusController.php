@@ -3,12 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alumnus;
-use App\Policies\AlumnusPolicy;
+use \App\Models\UniversityFaculty;
+use \App\Models\ResearchField;
+use \App\Models\FurtherCourse;
+use \App\Models\Major;
+use \App\Models\ScientificDegree;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Session;
-use Redirect;
+use Illuminate\Database\Eloquent\Builder;
+use App\Policies\AlumnusPolicy;
 
 class AlumnusController extends Controller
 {
@@ -27,12 +35,84 @@ class AlumnusController extends Controller
 
             return view('alumni.index', [
                 'alumni' => \App\Models\Alumnus::whereNotIn('id', $idsHavingDraftPairs)->paginate(10),
+                'majors_enum' => Major::$majors_enum,
+                'further_courses_enum' => FurtherCourse::$further_courses_enum,
+                'scientific_degrees_enum' => ScientificDegree::$scientific_degrees_enum,
+                'research_fields_enum' => ResearchField::$research_fields_enum,
             ]);
         } else {
             return view('alumni.index', [
                 'alumni' => \App\Models\Alumnus::where('is_draft', false)->paginate(10),
+                'majors_enum' => Major::$majors_enum,
+                'further_courses_enum' => FurtherCourse::$further_courses_enum,
+                'scientific_degrees_enum' => ScientificDegree::$scientific_degrees_enum,
+                'research_fields_enum' => ResearchField::$research_fields_enum,
             ]);
         }
+    }
+
+    public function searchAlumni(Request $request)
+    {
+        // TODO: megoldani hogy pagination oldal váltásnál is megmaradjon a szűrés
+        // vagy legalább ha üres a request akkor legyen pagination
+
+        $name = $request->input('name');
+        $start_of_membership = $request->input('start_of_membership');
+        $major = $request->input('major');
+        $further_course = $request->input('further_course');
+        $scientific_degree = $request->input('scientific_degree');
+        $research_field = $request->input('research_field');
+
+        $query = Alumnus::query();
+
+        if (isset($name)) {
+            $query->where('name', 'LIKE', "%$name%");
+        }
+
+        if (isset($start_of_membership)) {
+            $query->where('start_of_membership', $start_of_membership);
+        }
+
+        if (isset($major)) {
+            $query->whereHas('majors', function (Builder $q) use ($major) {
+                $q->where('name', $major);
+            });
+        }
+
+        if (isset($further_course)) {
+            $query->whereHas('further_courses', function (Builder $q) use ($further_course) {
+                $q->where('name', $further_course);
+            });
+        }
+
+        if (isset($scientific_degree)) {
+            $query->whereHas('scientific_degrees', function (Builder $q) use ($scientific_degree) {
+                $q->where('name', $scientific_degree);
+            });
+        }
+
+        if (isset($research_field)) {
+            $query->whereHas('research_fields', function (Builder $q) use ($research_field) {
+                $q->where('name', $research_field);
+            });
+        }
+
+        $user = Auth::user();
+        if ($user && $user->can('create', Alumnus::class)) {
+            $idsHavingDraftPairs = DB::table('alumni')->where('is_draft', false)->whereNotNull('pair_id')->pluck('id');
+            $alumni = $query->whereNotIn('id', $idsHavingDraftPairs)->paginate(10);
+        } else {
+            $alumni = $query->where('is_draft', false)->paginate(10);
+        }
+
+        return view('alumni.index', [
+            'alumni' => $alumni,
+            'search' => true,
+            'majors_enum' => Major::$majors_enum,
+            'further_courses_enum' => FurtherCourse::$further_courses_enum,
+            'scientific_degrees_enum' => ScientificDegree::$scientific_degrees_enum,
+            'research_fields_enum' => ResearchField::$research_fields_enum,
+        ]);
     }
 
     /**
@@ -42,9 +122,12 @@ class AlumnusController extends Controller
      */
     public function create()
     {
-        // TODO: kar, szak, stb. átadása
         return view('alumni.create_or_edit', [
-            ''
+            'university_faculties' => UniversityFaculty::$university_faculties_enum,
+            'majors' => Major::$majors_enum,
+            'further_courses' => FurtherCourse::$further_courses_enum,
+            'scientific_degrees' => ScientificDegree::$scientific_degrees_enum,
+            'research_fields' => ResearchField::$research_fields_enum,
         ]);
     }
 
@@ -62,12 +145,23 @@ class AlumnusController extends Controller
                 'birth_place' => 'nullable|min:3',
                 'high_school' => 'nullable|min:3',
                 'graduation_date' => 'nullable|numeric|gt:1930',
-                'further_course_detailed' => 'nullable|max:255',
+                'further_course_detailed' => 'nullable|max:2000',
                 'start_of_membership' => 'nullable|numeric|gt:1930',
-                'recognations' => 'nullable|max:255',
-                'research_field_detailed' => 'nullable|max:255',
-                'links' => 'nullable|max:255',
-                'works' => 'nullable|max:255',
+                'recognations' => 'nullable|max:2000',
+                'research_field_detailed' => 'nullable|max:2000',
+                'links' => 'nullable|max:2000',
+                'works' => 'nullable|max:2000',
+                'university_faculties' => 'nullable|array',
+                'majors' => 'nullable|array',
+                'further_courses' => 'nullable|array',
+                'scientific_degrees' => 'nullable|array',
+                'research_fields' => 'nullable|array',
+                'dla_year' => 'nullable|numeric|gt:1930',
+                'hab_year' => 'nullable|numeric|gt:1930',
+                'mta_year' => 'nullable|numeric|gt:1930',
+                'candidate_year' => 'nullable|numeric|gt:1930',
+                'doctor_year' => 'nullable|numeric|gt:1930',
+                'phd_year' => 'nullable|numeric|gt:1930',
             ]
         );
     }
@@ -82,7 +176,7 @@ class AlumnusController extends Controller
         $validated = AlumnusController::validateRequest($request);
 
         // TODO: id?
-        return Alumnus::factory()->create([
+        $alumnus = Alumnus::factory()->create([
             'is_draft' => $isDraft,
             'pair_id' => $pairId,
             'name' => $validated['name'],
@@ -98,6 +192,8 @@ class AlumnusController extends Controller
             'links' => $validated['links'],
             'works' => $validated['works'],
         ]);
+        AlumnusController::synchroniseConnections($alumnus, $validated);
+        return $alumnus;
     }
 
     /**
@@ -115,6 +211,79 @@ class AlumnusController extends Controller
         $isDraft = (!$user) || (!$user->can('create', Alumnus::class) && $user->can('createDraft', Alumnus::class));
 
         $alumnus = AlumnusController::validateAndStore($request, $isDraft, null);
+
+        // University faculty
+        // olyan unifaculty létrehozása, ami még nincs, a többi id lekérése database-ből és szinkronizálás
+        if (isset($validated["university_faculties"])) {
+            $existing_university_faculties = Arr::flatten(UniversityFaculty::select('name')->get()->makeHIdden('pivot')->toArray());
+            $missing_university_faculties = array_diff($validated['university_faculties'], $existing_university_faculties);
+            foreach ($missing_university_faculties as $faculty) {
+                UniversityFaculty::factory()->create([
+                    'name' => $faculty
+                ]);
+            }
+            $university_faculty_ids = Arr::flatten(UniversityFaculty::select('id')->whereIn('name', $validated['university_faculties'])->get()->makeHIdden('pivot')->toArray());
+            $alumnus->university_faculties()->sync($university_faculty_ids);
+        }
+
+        // Major
+        if (isset($validated["majors"])) {
+            $existing_majors = Arr::flatten(Major::select('name')->get()->makeHIdden('pivot')->toArray());
+            $missing_majors = array_diff($validated['majors'], $existing_majors);
+            foreach ($missing_majors as $major) {
+                Major::factory()->create([
+                    'name' => $major
+                ]);
+            }
+            $major_ids = Arr::flatten(Major::select('id')->whereIn('name', $validated['majors'])->get()->makeHIdden('pivot')->toArray());
+            $alumnus->majors()->sync($major_ids);
+        }
+
+        // Further courses
+        if (isset($validated["further_courses"])) {
+            $existing_further_courses = Arr::flatten(FurtherCourse::select('name')->get()->makeHIdden('pivot')->toArray());
+            $missing_further_courses = array_diff($validated['further_courses'], $existing_further_courses);
+            foreach ($missing_further_courses as $further_course) {
+                FurtherCourse::factory()->create([
+                    'name' => $further_course
+                ]);
+            }
+            $ids = Arr::flatten(FurtherCourse::select('id')->whereIn('name', $validated['further_courses'])->get()->makeHIdden('pivot')->toArray());
+            $alumnus->further_courses()->sync($ids);
+        }
+
+        // Scientific degree
+        if (isset($validated["scientific_degrees"])) {
+            $ids = [];
+            foreach ($validated["scientific_degrees"] as $scientific_degree) {
+                $degree = ScientificDegree::factory()->create([
+                    'name' => $scientific_degree,
+                    'obtain_year' => (
+                            isset($validated['doctor_year']) && strcmp($scientific_degree, 'egyetemi doktor') == 0 ? $validated['doctor_year'] :
+                            (isset($validated['candidate_year']) && strcmp($scientific_degree, 'kandidátus') == 0 ? $validated['candidate_year'] :
+                            (isset($validated['mta_year']) && strcmp($scientific_degree, 'tudományok doktora/MTA doktora') == 0 ? $validated['mta_year'] :
+                            (isset($validated['hab_year']) && strcmp($scientific_degree, 'habilitáció') == 0 ? $validated['hab_year'] :
+                            (isset($validated['phd_year']) && strcmp($scientific_degree, 'PhD') == 0 ? $validated['phd_year'] :
+                            (isset($validated['dla_year']) && strcmp($scientific_degree, 'DLA') == 0 ? $validated['dla_year'] : null)))))
+                        )
+                ]);
+                array_push($ids,$degree->id);
+            }
+            $alumnus->scientific_degrees()->sync($ids);
+        }
+
+        // Research fields
+        if (isset($validated["research_fields"])) {
+            $existing_research_fields = Arr::flatten(ResearchField::select('name')->get()->makeHIdden('pivot')->toArray());
+            $missing_research_fields = array_diff($validated['research_fields'], $existing_research_fields);
+            foreach ($missing_research_fields as $research_field) {
+                ResearchField::factory()->create([
+                    'name' => $research_field
+                ]);
+            }
+            $ids = Arr::flatten(ResearchField::select('id')->whereIn('name', $validated['research_fields'])->get()->makeHIdden('pivot')->toArray());
+            $alumnus->research_fields()->sync($ids);
+        }
 
         Session::flash('alumnus_created', $alumnus->name);
 
@@ -139,6 +308,7 @@ class AlumnusController extends Controller
         return view('alumni.show', [
             'alumnus' => $alumnus,
         ]);
+
     }
 
     /**
@@ -152,9 +322,39 @@ class AlumnusController extends Controller
         $user = Auth::user();
         if (!$user || $user->can('update', $alumnus) || $user->can('createDraftFor', $alumnus)) { //now this is true for everyone
             return view('alumni.create_or_edit', [
+                'university_faculties' => UniversityFaculty::$university_faculties_enum,
+                'majors' => Major::$majors_enum,
+                'further_courses' => FurtherCourse::$further_courses_enum,
+                'scientific_degrees' => ScientificDegree::$scientific_degrees_enum,
+                'research_fields' => ResearchField::$research_fields_enum,
                 'alumnus' => $alumnus,
             ]);
         } else abort(403);
+    }
+
+    /**
+     * Synchronises the alumnus' connections with other tables.
+     */
+    private static function synchroniseConnections(Alumnus $alumnus, array $validated): void {
+        if (isset($validated["university_faculties"])) {
+            $ids = UniversityFaculty::all()->whereIn('name', $validated['university_faculties'])->pluck('id')->toArray();
+            $alumnus->university_faculties()->sync($ids);
+        }
+
+        if (isset($validated["majors"])) {
+            $ids = Major::all()->whereIn('name', $validated['majors'])->pluck('id')->toArray();
+            $alumnus->majors()->sync($ids);
+        }
+
+        if (isset($validated["further_courses"])) {
+            $ids = FurtherCourse::all()->whereIn('name', $validated['further_courses'])->pluck('id')->toArray();
+            $alumnus->further_courses()->sync($ids);
+        }
+
+        if (isset($validated["research_fields"])) {
+            $ids = ResearchField::all()->whereIn('name', $validated['research_fields'])->pluck('id')->toArray();
+            $alumnus->research_fields()->sync($ids);
+        }
     }
 
     /**
@@ -166,6 +366,8 @@ class AlumnusController extends Controller
      */
     public function update(Request $request, Alumnus $alumnus)
     {
+        // TODO: scientific degree and years somehow and in the seader create every field!!
+
         $user = Auth::user();
         // it will be a draft if:
         //   they are guests, or
@@ -178,8 +380,8 @@ class AlumnusController extends Controller
             $alumnus->pair_id = $draftAlumnus->id;
             $alumnus->save();
 
-            return redirect()->route('alumni.show', $alumnus)
-                    ->with('success', 'Az adatokat elmentettük; egy adminisztrátor jóváhagyása után lesznek elérhetőek. Köszönjük!');
+            Session::flash('draft_changes_saved');
+            return Redirect::route('alumni.show', $alumnus);
         } else {
             //they are no guests and they can edit the non-draft directly
             //this also ensures $alumnus is not a draft
@@ -199,7 +401,10 @@ class AlumnusController extends Controller
                 'links' => $validated['links'],
                 'works' => $validated['works'],
             ]);
-            return redirect()->route('alumni.show', $alumnus)->with('success', 'Sikeres módosítás');
+            AlumnusController::synchroniseConnections($alumnus, $validated);
+            
+            Session::flash('alumnus_updated', $alumnus->name);
+            return Redirect::route('alumni.show', $alumnus);
         }
     }
 
@@ -232,7 +437,8 @@ class AlumnusController extends Controller
             $alumnus->save();
         }
 
-        return redirect()->route('alumni.show', $alumnus)->with('success', "Sikeresen jóváhagyva és publikálva");
+        Session::flash('alumnus_accepted', $alumnus->name);
+        return redirect()->route('alumni.show', $alumnus);
     }
 
     /**
@@ -246,6 +452,8 @@ class AlumnusController extends Controller
         $this->authorize('reject', $alumnus); //this also guarantees that $alumnus really is a draft
 
         $pairId = $alumnus->pair_id;
+
+        Session::flash('alumnus_rejected', $alumnus->name);
 
         if ($pairId) { //if there is a non-draft pair
             $pairAlumnus = Alumnus::find($pairId);
@@ -267,6 +475,10 @@ class AlumnusController extends Controller
      */
     public function destroy(Alumnus $alumnus)
     {
-        //
+        // TODO: authorize
+        $alumnus->delete();
+        Session::flash('alumnus_deleted', $alumnus->name);
+        return Redirect::route('alumni.index');
+
     }
 }

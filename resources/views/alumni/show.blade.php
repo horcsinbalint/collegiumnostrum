@@ -6,6 +6,35 @@
 <div class="container">
 
     {{-- TODO: Session flashes --}}
+    @if (Session::has('alumnus_created'))
+        <div class="alert alert-success" role="alert">
+            {{ Session::get('alumnus_created') }} hozzáadva!
+        </div>
+    @endif
+
+    @if (Session::has('draft_changes_saved'))
+        <div class="alert alert-success" role="alert">
+            Az adatokat elmentettük; egy adminisztrátor jóváhagyása után lesznek elérhetőek. Köszönjük!
+        </div>
+    @endif
+    
+    @if (Session::has('alumnus_updated'))
+        <div class="alert alert-success" role="alert">
+            {{ Session::get('alumnus_updated') }} frissítve!
+        </div>
+    @endif
+
+    @if (Session::has('alumnus_accepted'))
+        <div class="alert alert-success" role="alert">
+            {{ Session::get('alumnus_accepted') }} jóváhagyva és publikálva!
+        </div>
+    @endif
+
+    @if (Session::has('alumnus_rejected'))
+        <div class="alert alert-danger" role="alert">
+            {{ Session::get('alumnus_rejected') }} módosításai elutasítva és törölve!
+        </div>
+    @endif
 
     <a href="{{ route('alumni.index') }}"><i class="fas fa-long-arrow-alt-left"></i> Vissza a kezdőlapra</a>
 
@@ -71,15 +100,24 @@
             </div>
             @endif
 
-            @if(isset($alumnus->university_faculty) or $alumnus->majors()->exists())
+            @if($alumnus->university_faculties()->exists() or $alumnus->majors()->exists())
             <div class="mb-2">
                 <h2>Egyetemi adatok</h2>
-                @isset($alumnus->university_faculty)
+                @if($alumnus->university_faculties()->exists())
+                    @php
+                        $university_faculties_array = Arr::flatten($alumnus->university_faculties()->select('name')->get()->makeHIdden('pivot')->toArray());
+                    @endphp
+
                     <p class="text mb-0">
                         <i class="fas fa-user"></i>
-                        <span>Egyetemi szak: {{ $alumnus->university_faculty }}</span>
+                        @if(count($university_faculties_array) > 1)
+                        <span>Egyetemi karok: {{ implode(", ", $university_faculties_array) }}</span>
+                        @else
+                        <span>Egyetemi kar: {{ implode(", ", $university_faculties_array) }}</h3></span>
+                        @endif
                     </p>
-                @endisset
+
+                @endif
 
                 @if($alumnus->majors()->exists())
                     @php
@@ -89,9 +127,9 @@
                     <p class="text mb-0">
                         <i class="fas fa-user"></i>
                         @if(count($majors_array) > 1)
-                        <span>Egyetemi karok: {{ implode(", ", $majors_array) }}</span>
+                        <span>Egyetemi szakok: {{ implode(", ", $majors_array) }}</span>
                         @else
-                        <span>Egyetemi kar: {{ implode(", ", $majors_array) }}</h3></span>
+                        <span>Egyetemi szak: {{ implode(", ", $majors_array) }}</h3></span>
                         @endif
                     </p>
                 @endif
@@ -128,7 +166,7 @@
                     @foreach ($alumnus->scientific_degrees as $degree)
                     <p class="text mb-0">
                         <i class="fas fa-user"></i>
-                        <span>{{ $degree->name . (isset($degree->year) ? " (" . $degree->year . ")" : "") }}</span>
+                        <span>{{ $degree->name . (isset($degree->obtain_year) ? " (" . $degree->obtain_year . ")" : "") }}</span>
                     </p>
                     @endforeach
                 @endif
@@ -242,8 +280,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    {{-- TODO: Title --}}
-                    Biztosan törölni szeretné a következő személyt az adatbázisból: <strong>{{ $alumnus->name }} </strong>?
+                    Biztosan törölni szeretné a következő személyt az adatbázisból: <strong>{{ $alumnus->name }}</strong>?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Mégse</button>
@@ -255,7 +292,6 @@
                         Igen, törlés
                     </button>
 
-                    {{-- TODO: Route, directives --}}
                     <form id="delete-post-form" action="#" method="POST" class="d-none">
                         @method('DELETE')
                         @csrf
