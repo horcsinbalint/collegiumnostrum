@@ -132,6 +132,16 @@ class AlumnusController extends Controller
     }
 
     /**
+     * Show the form for importing new alumni from a spreadsheet file.
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function import_create()
+    {
+        return view('alumni.import', ['']);
+    }
+
+    /**
      * Validates a store/update request and returns an array containing the validated keys and values.
      */
     private static function validateRequest(Request $request): array
@@ -291,6 +301,219 @@ class AlumnusController extends Controller
             return Redirect::route('alumni.index')->with('success','Az adatokat elmentettük; egy adminisztrátor jóváhagyása után lesznek elérhetőek. Köszönjük!');
         } else {
             return Redirect::route('alumni.show', $alumnus);
+        }
+    }
+
+    const ALPHABET=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z",
+                    "AA","AB","AC"];
+
+    /**Extracts the rows from the worksheet into an array, from $startingRow (starting from zero) until the end, from the first column until $lastColumn (starting from zero).
+     * $lastColumn must be <26 for now.
+     */
+    public static function worksheet_to_array(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $worksheet, int $startingRow, int $lastColumn): array
+    {
+        $highestRow = $worksheet->getHighestRow();
+        $arr=array();
+        $lastColLet = AlumnusController::ALPHABET[$lastColumn];
+        for ($i = $startingRow+1; $i <= $highestRow; ++$i) //indexing starts from 1 here
+        {
+            $arr[] = array_values( //converting to an indexed array; otherwise it would have to be indexed by letters
+                $worksheet->rangeToArray( //appending it to the end
+                    "A$i:$lastColLet$i",     // The worksheet range that we want to retrieve
+                    NULL,        // Value that should be returned for empty cells
+                    TRUE,        // Should formulas be calculated (the equivalent of getCalculatedValue() for each cell)
+                    TRUE,        // Should values be formatted (the equivalent of getFormattedValue() for each cell)
+                    TRUE         // Should the array be indexed by cell row and cell column
+                )[$i] //it would otherwise add an extra dimension
+            );
+        }
+        return $arr;
+    }
+
+    /**Maps extensions to PhpSpreadsheet's file descriptors. */
+    const EXTENSION_TO_DESCRIPTOR = [
+        'txt' => 'Csv', //Laravel recognizes csv files as txt
+        'ods' => 'Ods',
+        'xls' => 'Xls',
+        'xlsx' => 'Xlsx'
+    ];
+
+    /**
+     * Breaks lists of faculties, degrees etc. into arrays and searches for the corresponding ids.
+     * If there is no corresponding id, it leaves the string in the array and sets the first element of the tuple left in the array to false.
+     * Otherwise, it sets it to true and puts the id there.
+     * If $longstring is null, it returns an empty array.
+     */
+    private static function ids_from_string(string $separator, ?string $longstring, string $table): array {
+        if (!isset($longstring)) return [];
+        return array_filter(array_map(function($string) use ($table): array {
+            $string = trim($string);
+
+            $id = DB::table($table)->where('name', $string)->value('id');
+            if (isset($id)) return [true, $id];
+            else return [false, $string];
+        }, explode($separator, $longstring)),
+        function($object) {return isset($object);});
+    }
+
+    /**
+     * Handles a request with an uploaded worksheet file that contains more than one alumni.
+     * Extracts the data and stores it in new Alumnus objects.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function import_store(Request $request)
+    {
+        $request->validate(
+            [
+                'file' =>  'file',
+            ]
+        );
+        
+        $file = $request->file('file');
+        if (null == $file)
+        {
+            return redirect()->back()->with('message', 'Nincs kiválasztva fájl.');
+        }
+
+        $extension = $file->extension(); //Laravel guesses the extension based on file content
+        if (!isset( AlumnusController::EXTENSION_TO_DESCRIPTOR[$extension] )) {
+            return redirect()->back()->with('error', 'Nem támogatott fájlformátum.');
+        }
+
+        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader(
+            AlumnusController::EXTENSION_TO_DESCRIPTOR[$extension]
+        );
+        $reader->setReadDataOnly(true); //we don't care about formatting
+        //maybe a ReadFilter for only the cells in the appropriate columns?
+        $spreadsheet = $reader->load($file->getRealPath());
+        $worksheet = $spreadsheet->getActiveSheet();
+
+        $rows = AlumnusController::worksheet_to_array($worksheet, 1, 26);
+
+        //TODO: validating data from spreadsheet
+
+        $len = count($rows);
+        if ($len > 0)
+        {
+            $firstone = $rows[0][0];
+            foreach ($rows as $row)
+            {
+                //$row[7] contains the faculties
+                //$row[8] contains the majors
+                //$row[9] contains the further courses
+                //$row[11] has the scientific degrees, with dates in 12-17
+                //$row[19] has the research fields
+
+
+                $alumnus = Alumnus::factory()->create([
+                    'is_draft' => false,
+                    'name' => $row[1],
+                    'email' => $row[2],
+                    'birth_date' => $row[3],
+                    'birth_place' => $row[4],
+                    'high_school' => $row[5],
+                    'graduation_date' => $row[6],
+
+                    'further_course_detailed' => $row[10],
+                    'start_of_membership' => $row[18],
+                    'recognations' => $row[19],
+                    'research_field_detailed' => $row[21],
+                    'links' => $row[22],
+                    'works' => $row[23],
+                ]);
+
+                foreach (AlumnusController::ids_from_string(';',$row[7],'university_faculties') as $tuple)
+                {
+                    if ($tuple[0]) {
+                        $id = $tuple[1];
+                    } else {
+                        $id = UniversityFaculty::create([
+                            'name' => $tuple[1],
+                        ])->id;
+                    }
+
+                    DB::table('alumnus_university_faculty')->insert([
+                        'alumnus_id' => $alumnus->id,
+                        'university_faculty_id' => $id,
+                    ]);
+                }
+                foreach (AlumnusController::ids_from_string(';',$row[8],'majors') as $tuple)
+                {
+                    if ($tuple[0]) {
+                        $id = $tuple[1];
+                    } else {
+                        $id = Major::create([
+                            'name' => $tuple[1],
+                        ])->id;
+                    }
+
+                    DB::table('alumnus_major')->insert([
+                        'alumnus_id' => $alumnus->id,
+                        'major_id' => $id,
+                    ]);
+                }
+                foreach (AlumnusController::ids_from_string(';',$row[9],'further_courses') as $tuple)
+                {
+                    if ($tuple[0]) {
+                        $id = $tuple[1];
+                    } else {
+                        $id = FurtherCourse::create([
+                            'name' => $tuple[1],
+                        ])->id;
+                    }
+
+                    DB::table('alumnus_further_course')->insert([
+                        'alumnus_id' => $alumnus->id,
+                        'further_course_id' => $id,
+                    ]);
+                }
+                foreach (AlumnusController::ids_from_string(';',$row[20],'research_fields') as $tuple)
+                {
+                    if ($tuple[0]) {
+                        $id = $tuple[1];
+                    } else {
+                        $id = ResearchField::create([
+                            'name' => $tuple[1],
+                        ])->id;
+                    }
+
+                    DB::table('alumnus_research_field')->insert([
+                        'alumnus_id' => $alumnus->id,
+                        'research_field_id' => $id,
+                    ]);
+                }
+                /*
+                TODO
+                //this has to be done separately, since there is the year stored in the ScientificDegree
+                //maybe once in the connection table...
+                //until then, a new one for every instance
+                foreach (array_map('trim', explode(';',explode($separator, $longstring))) as $degreename)
+                {
+                    if ($degreename != '') {
+                        $id = ScientificDegree::create([
+                            'name' => $degreename,
+                            'obtain_year' =>
+                        ])->id;
+
+                        DB::table('alumnus_scientific_degree')->insert([
+                            'alumnus_id' => $alumnus->id,
+                            'scientific_degree_id' => $id,
+                        ]);
+                    }
+                }
+                */
+            }
+
+            --$len;
+            //for some reason this does not work
+            return redirect()->route('alumni.index')
+                ->with('message', "Added $firstone and $len others");
+        } else
+        {
+            return redirect()->back()
+                ->with('message', 'A feltöltött fájl nem tartalmaz alumnikat.');
         }
     }
 

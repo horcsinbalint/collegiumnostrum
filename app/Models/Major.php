@@ -9,6 +9,10 @@ class Major extends Model
 {
     use HasFactory;
 
+    protected $fillable=[
+        'name',
+    ];
+
     public static $majors_enum = [
         'angol/anglisztika',
         'biológia',

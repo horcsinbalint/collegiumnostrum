@@ -9,6 +9,10 @@ class UniversityFaculty extends Model
 {
     use HasFactory;
 
+    protected $fillable=[
+        'name',
+    ];
+
     public static $university_faculties_enum = [
         'Állam- és Jogtudományi Kar',
         'Bárczi Gusztáv Gyógypedagógiai Kar',

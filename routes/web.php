@@ -19,6 +19,8 @@ Route::get('/', function () {
     return view('welcome.welcome');
 });
 
+Route::get('/alumni/import/create', [AlumnusController::class, 'import_create'])->name('alumni.import.create');
+Route::post('/alumni/import', [AlumnusController::class, 'import_store'])->name('alumni.import.store');
 Route::get('/alumni/search', [AlumnusController::class, 'searchAlumni'])->name('alumni.search');
 Route::post('/alumni/{alumnus}/accept', [AlumnusController::class, 'accept'])->name('alumni.accept');
 Route::post('/alumni/{alumnus}/reject', [AlumnusController::class, 'reject'])->name('alumni.reject');

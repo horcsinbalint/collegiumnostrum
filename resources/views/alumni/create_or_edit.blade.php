@@ -155,8 +155,7 @@
                             {{-- TODO: name, checked --}}
 
                             @checked(
-                                is_array(old('university_faculties')) &&
-                                in_array(strval($faculty), old('university_faculties', [])))
+                                in_array(strval($faculty), old('university_faculties', $alumnus->university_faculties->pluck('name')->toArray())))
                             )
                         >
                         {{-- TODO --}}
@@ -194,8 +193,7 @@
                             {{-- TODO: name, checked --}}
 
                             @checked(
-                                is_array(old('majors')) &&
-                                in_array(strval($major), old('majors', [])))
+                                in_array(strval($major), old('majors', $alumnus->majors->pluck('name')->toArray())))
                             )
                         >
                         {{-- TODO --}}
@@ -252,8 +250,7 @@
                             {{-- TODO: name, checked --}}
 
                             @checked(
-                                is_array(old('further_courses')) &&
-                                in_array(strval($further_course), old('further_courses', [])))
+                                in_array(strval($further_course), old('further_courses', $alumnus->further_courses->pluck('name')->toArray())))
                             )
                         >
                         {{-- TODO --}}
@@ -318,8 +315,7 @@
                             {{-- TODO: name, checked --}}
 
                             @checked(
-                                is_array(old('scientific_degrees')) &&
-                                in_array(strval($scientific_degree), old('scientific_degrees', [])))
+                                in_array(strval($scientific_degree), old('scientific_degrees', $alumnus->scientific_degrees->pluck('name')->toArray())))
                             )
                         >
                         {{-- TODO --}}
@@ -465,8 +461,7 @@
                             {{-- TODO: name, checked --}}
 
                             @checked(
-                                is_array(old('research_fields')) &&
-                                in_array(strval($research_field), old('research_fields', [])))
+                                in_array(strval($research_field), old('research_fields', $alumnus->research_fields->pluck('name')->toArray())))
                             )
                         >
                         {{-- TODO --}}

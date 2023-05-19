@@ -13,7 +13,7 @@
                 {{-- TODO: Links, policy --}}
                 <a href="{{ route('alumni.create') }}" role="button" class="btn btn-sm btn-success mb-1"><i class="fas fa-plus-circle"></i> Új hozzáadása </a>
                 {{-- TODO: Links, policy --}}
-                <a href="#" role="button" class="btn btn-sm btn-success mb-1"><i class="fas fa-plus-circle"></i> Importálás </a>
+                <a href="{{ route('alumni.import.create') }}" role="button" class="btn btn-sm btn-success mb-1"><i class="fas fa-plus-circle"></i> Importálás </a>
                 @endcan
             </div>
         </div>
