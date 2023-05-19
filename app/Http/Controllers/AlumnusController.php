@@ -119,7 +119,7 @@ class AlumnusController extends Controller
         Session::flash('alumnus_created', $alumnus->name);
 
         if ($isDraft) {
-            return "Az adatokat elmentettük; egy adminisztrátor jóváhagyása után lesznek elérhetőek. Köszönjük!";
+            return Redirect::route('alumni.index')->with('success','Az adatokat elmentettük; egy adminisztrátor jóváhagyása után lesznek elérhetőek. Köszönjük!');
         } else {
             return Redirect::route('alumni.show', $alumnus);
         }
@@ -178,7 +178,8 @@ class AlumnusController extends Controller
             $alumnus->pair_id = $draftAlumnus->id;
             $alumnus->save();
 
-            return "Az adatokat elmentettük; egy adminisztrátor jóváhagyása után lesznek elérhetőek. Köszönjük!";
+            return redirect()->route('alumni.show', $alumnus)
+                    ->with('success', 'Az adatokat elmentettük; egy adminisztrátor jóváhagyása után lesznek elérhetőek. Köszönjük!');
         } else {
             //they are no guests and they can edit the non-draft directly
             //this also ensures $alumnus is not a draft
@@ -198,7 +199,7 @@ class AlumnusController extends Controller
                 'links' => $validated['links'],
                 'works' => $validated['works'],
             ]);
-            return redirect()->route('alumni.show', $alumnus)->with('message', 'Sikeres módosítás');
+            return redirect()->route('alumni.show', $alumnus)->with('success', 'Sikeres módosítás');
         }
     }
 
@@ -231,7 +232,7 @@ class AlumnusController extends Controller
             $alumnus->save();
         }
 
-        return redirect()->route('alumni.show', $alumnus)->with('message', "Sikeresen jóváhagyva és publikálva");
+        return redirect()->route('alumni.show', $alumnus)->with('success', "Sikeresen jóváhagyva és publikálva");
     }
 
     /**
