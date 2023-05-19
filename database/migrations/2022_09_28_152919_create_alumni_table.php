@@ -31,7 +31,6 @@ return new class extends Migration
 
 
             // Kapcsoló tábla: major, further_course, scientific_degree, research_field
-            // TODO: university_faculty table
             $table->timestamps();
         });
     }
