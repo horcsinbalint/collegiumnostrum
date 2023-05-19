@@ -42,6 +42,9 @@
             </div>
 
         </div>
+        @cannot('create', \App\Models\Alumnus::class)
+        <p class="lead">Ha nem talál valakit, <a href="mailto:root@eotvos.elte.hu">írjon nekünk</a>.</p>
+        @endcan
         <div class="col-12 col-lg-12">
             <div class="row">
                 {{-- TODO: Read posts from DB --}}
