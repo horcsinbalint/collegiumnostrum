@@ -430,7 +430,7 @@ class AlumnusController extends Controller
 
             $originalPair->delete();
 
-            $alumnus->id = $originalPairId;
+            $alumnus->id = $originalPairId; //because of onUpdate('cascade'), this will update the connection tables, too
             $alumnus->save();
         } else { //if it is null
             $alumnus->is_draft = false;

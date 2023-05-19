@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['alumnus_id', 'scientific_degree_id']);
-            $table->foreign('alumnus_id')->references('id')->on('alumni')->onDelete('cascade');
+            $table->foreign('alumnus_id')->references('id')->on('alumni')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('scientific_degree_id')->references('id')->on('scientific_degrees')->onDelete('cascade');
         });
     }
