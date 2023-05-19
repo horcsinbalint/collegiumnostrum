@@ -304,7 +304,8 @@ class AlumnusController extends Controller
         }
     }
 
-    const ALPHABET="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const ALPHABET=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z",
+                    "AA","AB","AC"];
 
     /**Extracts the rows from the worksheet into an array, from $startingRow (starting from zero) until the end, from the first column until $lastColumn (starting from zero).
      * $lastColumn must be <26 for now.
@@ -336,6 +337,24 @@ class AlumnusController extends Controller
         'xls' => 'Xls',
         'xlsx' => 'Xlsx'
     ];
+
+    /**
+     * Breaks lists of faculties, degrees etc. into arrays and searches for the corresponding ids.
+     * If there is no corresponding id, it leaves the string in the array and sets the first element of the tuple left in the array to false.
+     * Otherwise, it sets it to true and puts the id there.
+     * If $longstring is null, it returns an empty array.
+     */
+    private static function ids_from_string(string $separator, ?string $longstring, string $table): array {
+        if (!isset($longstring)) return [];
+        return array_filter(array_map(function($string) use ($table): array {
+            $string = trim($string);
+
+            $id = DB::table($table)->where('name', $string)->value('id');
+            if (isset($id)) return [true, $id];
+            else return [false, $string];
+        }, explode($separator, $longstring)),
+        function($object) {return isset($object);});
+    }
 
     /**
      * Handles a request with an uploaded worksheet file that contains more than one alumni.
@@ -371,7 +390,7 @@ class AlumnusController extends Controller
         $spreadsheet = $reader->load($file->getRealPath());
         $worksheet = $spreadsheet->getActiveSheet();
 
-        $rows = AlumnusController::worksheet_to_array($worksheet, 1, 15);
+        $rows = AlumnusController::worksheet_to_array($worksheet, 1, 26);
 
         //TODO: validating data from spreadsheet
 
@@ -381,21 +400,110 @@ class AlumnusController extends Controller
             $firstone = $rows[0][0];
             foreach ($rows as $row)
             {
+                //$row[7] contains the faculties
+                //$row[8] contains the majors
+                //$row[9] contains the further courses
+                //$row[11] has the scientific degrees, with dates in 12-17
+                //$row[19] has the research fields
+
+
                 $alumnus = Alumnus::factory()->create([
-                    'name' => $row[0],
-                    'email' => $row[1],
-                    'birth_date' => $row[2],
-                    'birth_place' => $row[3],
-                    'high_school' => $row[4],
-                    'graduation_date' => $row[5],
-                    'start_of_membership' => $row[6],
-                    'further_course_detailed' => $row[7],
-                    'recognations' => $row[8],
-                    'research_field_detailed' => $row[9],
-                    'links' => $row[10],
-                    'works' => $row[11],
+                    'is_draft' => false,
+                    'name' => $row[1],
+                    'email' => $row[2],
+                    'birth_date' => $row[3],
+                    'birth_place' => $row[4],
+                    'high_school' => $row[5],
+                    'graduation_date' => $row[6],
+
+                    'further_course_detailed' => $row[10],
+                    'start_of_membership' => $row[18],
+                    'recognations' => $row[19],
+                    'research_field_detailed' => $row[21],
+                    'links' => $row[22],
+                    'works' => $row[23],
                 ]);
-                $names[] = $row[0];
+
+                foreach (AlumnusController::ids_from_string(';',$row[7],'university_faculties') as $tuple)
+                {
+                    if ($tuple[0]) {
+                        $id = $tuple[1];
+                    } else {
+                        $id = UniversityFaculty::create([
+                            'name' => $tuple[1],
+                        ])->id;
+                    }
+
+                    DB::table('alumnus_university_faculty')->insert([
+                        'alumnus_id' => $alumnus->id,
+                        'university_faculty_id' => $id,
+                    ]);
+                }
+                foreach (AlumnusController::ids_from_string(';',$row[8],'majors') as $tuple)
+                {
+                    if ($tuple[0]) {
+                        $id = $tuple[1];
+                    } else {
+                        $id = Major::create([
+                            'name' => $tuple[1],
+                        ])->id;
+                    }
+
+                    DB::table('alumnus_major')->insert([
+                        'alumnus_id' => $alumnus->id,
+                        'major_id' => $id,
+                    ]);
+                }
+                foreach (AlumnusController::ids_from_string(';',$row[9],'further_courses') as $tuple)
+                {
+                    if ($tuple[0]) {
+                        $id = $tuple[1];
+                    } else {
+                        $id = FurtherCourse::create([
+                            'name' => $tuple[1],
+                        ])->id;
+                    }
+
+                    DB::table('alumnus_further_course')->insert([
+                        'alumnus_id' => $alumnus->id,
+                        'further_course_id' => $id,
+                    ]);
+                }
+                foreach (AlumnusController::ids_from_string(';',$row[20],'research_fields') as $tuple)
+                {
+                    if ($tuple[0]) {
+                        $id = $tuple[1];
+                    } else {
+                        $id = ResearchField::create([
+                            'name' => $tuple[1],
+                        ])->id;
+                    }
+
+                    DB::table('alumnus_research_field')->insert([
+                        'alumnus_id' => $alumnus->id,
+                        'research_field_id' => $id,
+                    ]);
+                }
+                /*
+                TODO
+                //this has to be done separately, since there is the year stored in the ScientificDegree
+                //maybe once in the connection table...
+                //until then, a new one for every instance
+                foreach (array_map('trim', explode(';',explode($separator, $longstring))) as $degreename)
+                {
+                    if ($degreename != '') {
+                        $id = ScientificDegree::create([
+                            'name' => $degreename,
+                            'obtain_year' =>
+                        ])->id;
+
+                        DB::table('alumnus_scientific_degree')->insert([
+                            'alumnus_id' => $alumnus->id,
+                            'scientific_degree_id' => $id,
+                        ]);
+                    }
+                }
+                */
             }
 
             --$len;

@@ -9,6 +9,11 @@ class ScientificDegree extends Model
 {
     use HasFactory;
 
+    protected $fillable=[
+        'name',
+        'obtain_year',
+    ];
+
     public static $scientific_degrees_enum = [
         'egyetemi doktor',
         'kandidátus',

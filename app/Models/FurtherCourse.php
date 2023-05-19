@@ -9,6 +9,10 @@ class FurtherCourse extends Model
 {
     use HasFactory;
 
+    protected $fillable=[
+        'name',
+    ];
+
     public static $further_courses_enum = [
         'akadémikus',
         'általános iskolai tanár',
