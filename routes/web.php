@@ -19,8 +19,9 @@ Route::get('/', function () {
     return view('welcome.welcome');
 });
 
-Route::resource('alumni', AlumnusController::class);
+Route::get('/alumni/search', [AlumnusController::class, 'searchAlumni'])->name('alumni.search');
 
+Route::resource('alumni', AlumnusController::class);
 
 // -----------------------------------------
 

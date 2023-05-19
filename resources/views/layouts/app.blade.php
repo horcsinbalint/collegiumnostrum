@@ -37,7 +37,10 @@
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('alumni.index') }}">{{ __('Kezdőlap') }}</a>
+                            <a class="nav-link" href="{{ url('/') }}">{{ __('Kezdőlap') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('alumni.index') }}">{{ __('Alumni adatbázis') }}</a>
                         </li>
                         <!-- Authentication Links -->
                         @guest

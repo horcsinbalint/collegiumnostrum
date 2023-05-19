@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
 
 class AlumnusController extends Controller
 {
@@ -26,6 +28,71 @@ class AlumnusController extends Controller
     {
         return view('alumni.index', [
             'alumni' => Alumnus::paginate(10),
+            'majors_enum' => Major::$majors_enum,
+            'further_courses_enum' => FurtherCourse::$further_courses_enum,
+            'scientific_degrees_enum' => ScientificDegree::$scientific_degrees_enum,
+            'research_fields_enum' => ResearchField::$research_fields_enum,
+        ]);
+    }
+
+    public function searchAlumni(Request $request)
+    {
+        // TODO: megoldani hogy pagination oldal váltásnál is megmaradjon a szűrés
+        // vagy legalább ha üres a request akkor legyen pagination
+
+        $name = $request->input('name');
+        $start_of_membership = $request->input('start_of_membership');
+        $major = $request->input('major');
+        $further_course = $request->input('further_course');
+        $scientific_degree = $request->input('scientific_degree');
+        $research_field = $request->input('research_field');
+
+        $query = Alumnus::query();
+
+        if (isset($name)) {
+            $query->where('name', 'LIKE', "%$name%");
+        }
+
+        if (isset($start_of_membership)) {
+            $query->where('start_of_membership', $start_of_membership);
+        }
+
+        if (isset($major)) {
+            $query->whereHas('majors', function (Builder $q) use ($major) {
+                $q->where('name', $major);
+            });
+        }
+
+        if (isset($further_course)) {
+            $query->whereHas('further_courses', function (Builder $q) use ($further_course) {
+                $q->where('name', $further_course);
+            });
+        }
+
+        if (isset($scientific_degree)) {
+            $query->whereHas('scientific_degrees', function (Builder $q) use ($scientific_degree) {
+                $q->where('name', $scientific_degree);
+            });
+        }
+
+        if (isset($research_field)) {
+            $query->whereHas('research_fields', function (Builder $q) use ($research_field) {
+                $q->where('name', $research_field);
+            });
+        }
+
+
+        $alumni = $query->get();
+
+
+
+        return view('alumni.index', [
+            'alumni' => $alumni,
+            'search' => true,
+            'majors_enum' => Major::$majors_enum,
+            'further_courses_enum' => FurtherCourse::$further_courses_enum,
+            'scientific_degrees_enum' => ScientificDegree::$scientific_degrees_enum,
+            'research_fields_enum' => ResearchField::$research_fields_enum,
         ]);
     }
 
