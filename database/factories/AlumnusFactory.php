@@ -30,6 +30,7 @@ class AlumnusFactory extends Factory
             'agreed' => true,
             'links' => fake()->url() . '\n' . fake()->url(),
             'works' => fake()->sentence(3),
+            'is_draft' => false,
         ];
     }
 }
