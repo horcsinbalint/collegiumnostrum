@@ -12,11 +12,58 @@
         </div>
     @endif
 
+    @if (Session::has('draft_changes_saved'))
+        <div class="alert alert-success" role="alert">
+            Az adatokat elmentettük; egy adminisztrátor jóváhagyása után lesznek elérhetőek. Köszönjük!
+        </div>
+    @endif
+    
+    @if (Session::has('alumnus_updated'))
+        <div class="alert alert-success" role="alert">
+            {{ Session::get('alumnus_updated') }} frissítve!
+        </div>
+    @endif
+
+    @if (Session::has('alumnus_accepted'))
+        <div class="alert alert-success" role="alert">
+            {{ Session::get('alumnus_accepted') }} jóváhagyva és publikálva!
+        </div>
+    @endif
+
+    @if (Session::has('alumnus_rejected'))
+        <div class="alert alert-danger" role="alert">
+            {{ Session::get('alumnus_rejected') }} módosításai elutasítva és törölve!
+        </div>
+    @endif
+
     <a href="{{ route('alumni.index') }}"><i class="fas fa-long-arrow-alt-left"></i> Vissza a kezdőlapra</a>
 
     <div class="row justify-content-between">
         <div class="col-12 col-md-8">
             <h1>{{ $alumnus->name }}</h1>
+
+            @if($alumnus->is_draft)
+                <p>
+                    <span class="text-danger lead"><b>Figyelem: ez egy még nem jóváhagyott változat!</b></span>
+                    @can('create', \App\Models\Alumnus::class)
+                    <br>Tekintse át a beküldött adatokat, és hagyja jóvá vagy utasítsa el a módosításokat.
+                    @endcan
+                    @if($alumnus->has_pair())
+                    <br><a href="{{ route('alumni.show', $alumnus->pair_id) }}">Jóváhagyott verzió</a>
+                    @endif
+                </p>
+            @elseif($alumnus->has_pair())
+            <p>
+                    <span class="text-danger lead"><b>Figyelem: ehhez az alumnushoz küldtek be nem jóváhagyott módosításokat!</b></span>
+                    @can('create', \App\Models\Alumnus::class)
+                    <br><a href="{{ route('alumni.show', $alumnus->pair_id) }}">Beküldött verzió megtekintése és jóváhagyása</a>
+                    @else
+                    <p class="text-danger">További módosítás nem lehetséges, amíg az adminisztrátorok azt el nem bírálják.
+                    <br>Ha sokáig nincs változás, <a href="mailto:root@eotvos.elte.hu">keressen minket</a>.
+                    </p>
+                    @endcan
+                </p>
+            @endif
 
             @if(isset($alumnus->birth_date) or isset($alumnus->birth_place) or isset($alumnus->high_school) or isset($alumnus->graduation_date))
             <div class="mb-2">
@@ -160,7 +207,7 @@
                 @isset($alumnus->links)
                     <p class="text mb-0">
                     <i class="fas fa-user"></i>
-                    MTMT hivatkozás vagy saját honlap/wikipédia szócikk:
+                    MTMT hivatkozás vagy saját honlap/Wikipédia-szócikk:
                         {!! nl2br(e($alumnus->links)) !!}
                     </p>
                 @endisset
@@ -179,14 +226,47 @@
 
         <div class="col-12 col-md-4">
             <div class="float-lg-end">
+                {{-- TODO: "are you sure"-modals --}}
+                
+                @if($alumnus->is_draft)
 
-                {{-- TODO: Links, policy --}}
+                @can('create', \App\Models\Alumnus::class)
+                <button
+                    type="button"
+                    class="btn btn-sm btn-success""
+                    onclick="document.getElementById('accept-post-form').submit();"
+                >
+                    <i class="fa-solid fa-check"></i> Jóváhagyás
+                </button>
+                <form id="accept-post-form" action="{{ route('alumni.accept', $alumnus) }}" method="POST" class="d-none">
+                    @csrf
+                </form>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-danger""
+                    onclick="document.getElementById('reject-post-form').submit();"
+                >
+                    <i class="fa-solid fa-xmark"></i> Elutasítás
+                </button>
+                <form id="reject-post-form" action="{{ route('alumni.reject', $alumnus) }}" method="POST" class="d-none">
+                    @csrf
+                </form>
+                @endcan
+
+                @elseif(!$alumnus->has_pair())
+
+                @can('create', \App\Models\Alumnus::class)
                 <a role="button" class="btn btn-sm btn-primary" href="{{ route('alumni.edit', $alumnus) }}"><i class="far fa-edit"></i> Szerkesztés</a>
 
                 <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#delete-confirm-modal"><i class="far fa-trash-alt">
-                    <span></i> Törlés</span>
+                    </i> Törlés
                 </button>
+                @elsecan('createDraftFor', $alumnus)
+                <a role="button" class="btn btn-sm btn-primary" href="{{ route('alumni.edit', $alumnus) }}"><i class="far fa-edit"></i> További információ beküldése</a>
+                @endcan
 
+                @endif
             </div>
         </div>
     </div>

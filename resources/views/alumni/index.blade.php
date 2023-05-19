@@ -9,10 +9,12 @@
         </div>
         <div class="col-12 col-md-4">
             <div class="float-lg-end">
+                @can('create', \App\Models\Alumnus::class)
                 {{-- TODO: Links, policy --}}
                 <a href="{{ route('alumni.create') }}" role="button" class="btn btn-sm btn-success mb-1"><i class="fas fa-plus-circle"></i> Új hozzáadása </a>
                 {{-- TODO: Links, policy --}}
                 <a href="#" role="button" class="btn btn-sm btn-success mb-1"><i class="fas fa-plus-circle"></i> Importálás </a>
+                @endcan
             </div>
         </div>
     </div>
@@ -91,7 +93,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-info">Keresés</button>
+                            <button type="submit" class="btn btn-primary">Keresés</button>
                         </form>
 
                         </div>
@@ -100,6 +102,9 @@
             </div>
 
         </div>
+        @cannot('create', \App\Models\Alumnus::class)
+        <p class="lead">Ha nem talál valakit, <a href="mailto:root@eotvos.elte.hu">írjon nekünk</a>.</p>
+        @endcan
         <div class="col-12 col-lg-12">
             <div class="row">
                 {{-- TODO: Read posts from DB --}}
@@ -108,11 +113,16 @@
                     <div class="col-12 col-md-6 col-lg-4 mb-3 d-flex align-self-stretch">
                         <div class="card w-100">
 
+                            @if ($alumnus->is_draft)
+                            <div class="card-body bg-info">
+                            @else
                             <div class="card-body">
+                            @endif
                                 {{-- TODO: Title --}}
-                                <h5 class="card-title mt-0">{{ $alumnus->name }}</h5>
-
-
+                                <h5 class="card-title mb-0">{{ $alumnus->name }}</h5>
+                                @if ($alumnus->is_draft)
+                                <p class="card-text text-danger">Jóváhagyásra vár</p>
+                                @endif
                                 <p class="small mb-0">
                                     @isset($alumnus->start_of_membership)
                                     <span class="me-2">
@@ -135,7 +145,7 @@
                             </div>
                             <div class="card-footer">
                                 {{-- TODO: Link --}}
-                                <a href="{{ route('alumni.show', $alumnus->id) }}" class="btn btn-info">
+                                <a href="{{ route('alumni.show', $alumnus->id) }}" class="btn btn-primary">
                                     <span>Részletek</span> <i class="fas fa-angle-right"></i>
                                 </a>
                             </div>
@@ -151,12 +161,9 @@
             </div>
             @if(isset($alumni) && !empty($alumni) && !isset($search))
                 <div class="d-flex justify-content-center">
-                    {{ $alumni->links() }}
+                    {{ $alumni->links('pagination::bootstrap-4') }}
                 </div>
             @endif
-
-
-
         </div>
 
     </div>

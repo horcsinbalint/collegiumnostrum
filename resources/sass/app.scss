@@ -4,3 +4,84 @@
 
 // Font Awesome ikonkészlet
 @import url('@fortawesome/fontawesome-free/css/all.css');
+
+$bottom-brown: #2f251a;
+$top-bread: #bc9632;
+$action-button: #d4942f;
+$action-button-hover: #9a6716;
+
+$danger-button: #a6370a;
+$danger-button-hover: #5a1a00;
+//$danger-button: #a0170d;
+//$danger-button-hover: #600600;
+//$danger-button: #bd5900;
+//$danger-button-hover: #8b4100;
+
+body {
+    background-color: $bottom-brown;
+}
+
+body > div {
+    background-color: white;
+}
+
+.header-banner-image {
+    height: 75px;
+}
+
+.banner-container {
+    display: block;
+    text-align: center;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.footer-wrapper {
+    background-color: $bottom-brown;
+    color: white;
+}
+
+.footer-link {
+    background-color: $bottom-brown;
+    color: white !important;
+    text-decoration: none;
+}
+
+
+.nav-link{
+    color: black !important;
+}
+
+.top-bar{
+    background-color: $top-bread!important;
+}
+
+.btn-success, .btn-success:active, .btn-success:visited, .btn-primary, .btn-primary:active, .btn-primary:visited {
+    background-color: $action-button!important;
+    border: var(--bs-btn-border-width) solid $action-button-hover;
+    color: white!important;
+}
+
+.btn-primary:hover, .btn-success:hover {
+    background-color: $action-button-hover!important;
+    border: var(--bs-btn-border-width) solid $action-button-hover;
+    color: white!important;
+}
+
+.btn-danger, .btn-danger:active, .btn-danger:visited {
+    background-color: $danger-button!important;
+    border: var(--bs-btn-border-width) solid $danger-button-hover;
+    color: white!important;
+}
+
+.btn-danger:hover {
+    background-color: $danger-button-hover!important;
+    border: var(--bs-btn-border-width) solid $danger-button-hover;
+    color: white!important;
+}
+
+/*EC logo*/
+img.header-banner-image {
+    margin: 0 7.5px;
+    filter: none;
+}
