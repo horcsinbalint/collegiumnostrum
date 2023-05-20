@@ -154,9 +154,11 @@
                             name="university_faculties[]"
                             {{-- TODO: name, checked --}}
 
-                            @checked(
-                                in_array(strval($faculty), old('university_faculties', $alumnus->university_faculties->pluck('name')->toArray())))
-                            )
+                            <?php
+                                if(isset($alumnus))
+                                    echo in_array(strval($faculty), old('university_faculties', $alumnus->university_faculties->pluck('name')->toArray()));
+                                    
+                            ?>
                         >
                         {{-- TODO --}}
                         <label for="faculty-{{ $faculty }}" class="form-check-label">
@@ -192,9 +194,12 @@
                             name="majors[]"
                             {{-- TODO: name, checked --}}
 
-                            @checked(
-                                in_array(strval($major), old('majors', $alumnus->majors->pluck('name')->toArray())))
-                            )
+
+                            <?php
+                                if(isset($alumnus))
+                                    echo in_array(strval($major), old('majors', $alumnus->majors->pluck('name')->toArray()));
+                                    
+                            ?>
                         >
                         {{-- TODO --}}
                         <label for="major-{{ $major }}" class="form-check-label">
@@ -249,9 +254,11 @@
                             name="further_courses[]"
                             {{-- TODO: name, checked --}}
 
-                            @checked(
-                                in_array(strval($further_course), old('further_courses', $alumnus->further_courses->pluck('name')->toArray())))
-                            )
+                            <?php
+                                if(isset($alumnus))
+                                    echo in_array(strval($further_course), old('further_courses', $alumnus->further_courses->pluck('name')->toArray()));
+                                    
+                            ?>
                         >
                         {{-- TODO --}}
                         <label for="further_course-{{ $further_course }}" class="form-check-label">
@@ -314,9 +321,11 @@
                             name="scientific_degrees[]"
                             {{-- TODO: name, checked --}}
 
-                            @checked(
-                                in_array(strval($scientific_degree), old('scientific_degrees', $alumnus->scientific_degrees->pluck('name')->toArray())))
-                            )
+                            <?php
+                                if(isset($alumnus))
+                                    echo in_array(strval($scientific_degree), old('scientific_degrees', $alumnus->scientific_degrees->pluck('name')->toArray()));
+                                    
+                            ?>
                         >
                         {{-- TODO --}}
                         <label for="scientific_degree-{{ $scientific_degree }}" class="form-check-label">
@@ -460,9 +469,12 @@
                             name="research_fields[]"
                             {{-- TODO: name, checked --}}
 
-                            @checked(
-                                in_array(strval($research_field), old('research_fields', $alumnus->research_fields->pluck('name')->toArray())))
-                            )
+
+                            <?php
+                                if(isset($alumnus))
+                                    echo in_array(strval($research_field), old('research_fields', $alumnus->research_fields->pluck('name')->toArray()));
+                                    
+                            ?>
                         >
                         {{-- TODO --}}
                         <label for="research_field-{{ $research_field }}" class="form-check-label">
