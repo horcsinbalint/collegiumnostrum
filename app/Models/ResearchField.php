@@ -9,6 +9,10 @@ class ResearchField extends Model
 {
     use HasFactory;
 
+    protected $fillable=[
+        'name',
+    ];
+
     public static $research_fields_enum = [
         'Matematika- és számítástudományok',
         'Fizikai tudományok',
