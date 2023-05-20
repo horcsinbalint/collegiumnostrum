@@ -18,7 +18,8 @@
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <style>
 
-        </style>
+    </style>
+    <link rel="icon" type="image/x-icon" href="https://eotvos.elte.hu/media/da/30/e9a7dd3606d1cf1b44a674b6b3f4d7b52638a8a0cdc56526c14c0010e4c0/ec_logo.png">
 </head>
 <body>
     <div id="app">
