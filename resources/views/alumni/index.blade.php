@@ -137,7 +137,6 @@
                                         $majors_array = Arr::flatten($alumnus->majors()->select('name')->get()->makeHIdden('pivot')->toArray());
                                     @endphp
                                     <span>
-                                        <i class="far fa-calendar-alt"></i>
                                         <span>Egyetemi szak(ok): {{ implode(", ", $majors_array) }}</span>
                                     </span>
                                     @endif
