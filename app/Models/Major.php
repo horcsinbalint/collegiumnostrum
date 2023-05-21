@@ -36,7 +36,7 @@ class Major extends Model
         'keleti nyelvek és kultúrák (török)',
         'keleti nyelvek és kultúrák (újgörög)',
         'kereskedelem és marketing',
-        'kommunikáció-és médiatudomány',
+        'kommunikáció- és médiatudomány',
         'kémia',
         'könyvtár/(informatikus)-könyvtáros',
         'környezettan',
