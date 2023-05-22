@@ -100,9 +100,9 @@ class AlumnusController extends Controller
         $user = Auth::user();
         if ($user && $user->can('create', Alumnus::class)) {
             $idsHavingDraftPairs = DB::table('alumni')->where('is_draft', false)->whereNotNull('pair_id')->pluck('id');
-            $alumni = $query->whereNotIn('id', $idsHavingDraftPairs)->get();
+            $alumni = $query->whereNotIn('id', $idsHavingDraftPairs)->paginate(10);
         } else {
-            $alumni = $query->where('is_draft', false)->get();
+            $alumni = $query->where('is_draft', false)->paginate(10);
         }
 
         return view('alumni.index', [
