@@ -43,15 +43,15 @@
                         <div class="card-body">
                         <form method="GET" action="{{ route('alumni.search') }}" enctype="multipart/form-data">
                             @csrf
-                            <input type="text" class="form-control" name="name" placeholder="Név">
-                            <input type="text" class="form-control" placeholder="Collegiumi tagság kezdete" pattern="\d{4}" maxlength="4" name="start_of_membership">
+                            <input type="text" class="form-control" name="name" placeholder="Név" value="{{ isset($_GET['name']) ? $_GET['name'] : '' }}">
+                            <input type="text" class="form-control" placeholder="Collegiumi tagság kezdete" pattern="\d{4}" maxlength="4" name="start_of_membership" value="{{ isset($_GET['start_of_membership']) ? $_GET['start_of_membership'] : '' }}">
                             <div class="panel panel-default">
                                 <div class="panel-body">
                                     <div class="form-group">
                                         <select name="major" class="form-control" id="majorDropdown">
                                             <option value="">Szak kiválasztása</option>
                                             @foreach ($majors_enum as $major)
-                                                <option value="{{ $major }}">{{ $major }}</option>
+                                                <option value="{{ $major }}" {{isset($_GET['major']) && $_GET['major'] == $major ? 'selected ' : ''}}>{{ $major }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -63,7 +63,7 @@
                                         <select name="further_course" class="form-control" id="furtherCourseDropdown">
                                             <option value="">További pálya kiválasztása</option>
                                             @foreach ($further_courses_enum as $further_course)
-                                                <option value="{{ $further_course }}">{{ $further_course }}</option>
+                                                <option value="{{ $further_course }}" {{isset($_GET['further_course']) && $_GET['further_course'] == $further_course ? 'selected ' : ''}}>{{ $further_course }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -75,7 +75,7 @@
                                         <select name="scientific_degree" class="form-control" id="scientificDegreeDropdown">
                                             <option value="">Tudományos fokozat kiválasztása</option>
                                             @foreach ($scientific_degrees_enum as $scientific_degree)
-                                                <option value="{{ $scientific_degree }}">{{ $scientific_degree }}</option>
+                                                <option value="{{ $scientific_degree }}" {{isset($_GET['scientific_degree']) && $_GET['scientific_degree'] == $scientific_degree ? 'selected ' : ''}}>{{ $scientific_degree }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -87,7 +87,7 @@
                                         <select name="research_field" class="form-control" id="researchFieldDropdown">
                                             <option value="">Kutatási terület kiválasztása</option>
                                             @foreach ($research_fields_enum as $research_field)
-                                                <option value="{{ $research_field }}">{{ $research_field }}</option>
+                                                <option value="{{ $research_field }}" {{isset($_GET['research_field']) && $_GET['research_field'] == $research_field ? 'selected ' : ''}}>{{ $research_field }}</option>
                                             @endforeach
                                         </select>
                                     </div>
