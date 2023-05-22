@@ -159,7 +159,7 @@
                     </div>
                 @endforelse
             </div>
-            @if(isset($alumni) && !empty($alumni) && !isset($search))
+            @if(isset($alumni) && !empty($alumni))
                 <div class="d-flex justify-content-center">
                     {{ $alumni->links('pagination::bootstrap-4') }}
                 </div>
@@ -224,6 +224,17 @@
             }
         });
     });
+
+    var links = document.getElementsByTagName("a");
+
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.delete("_token");
+    urlParams.delete("page");
+    for (var i = 0; i < links.length; i++) {
+        if(links[i].href.includes("alumni/search?page=")){
+            links[i].href += "&" + urlParams.toString();
+        }
+    }
 </script>
 
 @endsection
