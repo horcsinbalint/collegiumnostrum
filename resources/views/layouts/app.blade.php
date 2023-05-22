@@ -51,20 +51,8 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('alumni.index') }}">{{ __('Alumni adatbázis') }}</a>
                         </li>
-                        <!-- Authentication Links -->
-                        @guest
-                            @if (Route::has('login'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Bejelentkezés') }}</a>
-                                </li>
-                            @endif
-
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Regisztráció') }}</a>
-                                </li>
-                            @endif
-                        @else
+                        <!-- Logout, if logged in (otherwise the login option is at the bottom of the page so that it won't be confusing for guests) -->
+                        @auth
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }}
@@ -82,7 +70,7 @@
                                     </form>
                                 </div>
                             </li>
-                        @endguest
+                        @endauth
                     </ul>
                 </div>
             </div>
@@ -107,6 +95,13 @@
                     <div>
                         <span class="small"><a href="https://eotvos.elte.hu/" class="footer-link">Eötvös József Collegium</a></span>
                     </div>
+
+                    <!-- Login -->
+                    @guest
+                    <div>
+                        <a class="small footer-link" href="{{ route('login') }}">{{ __('Bejelentkezés adminisztrátoroknak') }}</a>
+                    </div>
+                    @endguest
                 </div>
             </div>
         </footer>
