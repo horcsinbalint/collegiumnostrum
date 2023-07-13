@@ -357,6 +357,17 @@ class AlumnusController extends Controller
     }
 
     /**
+     * Returns whether there is at least one non-null value in an array.
+     * Is useful for filtering empty rows.
+     */
+    private static function hasNonNull(array $arr): bool {
+        foreach ($arr as $val) {
+            if (!is_null($val)) return true;
+        }
+        return false;
+    }
+
+    /**
      * Handles a request with an uploaded worksheet file that contains more than one alumni.
      * Extracts the data and stores it in new Alumnus objects.
      * 
@@ -398,7 +409,7 @@ class AlumnusController extends Controller
         if ($len > 0)
         {
             $firstone = $rows[0][0];
-            foreach ($rows as $row)
+            foreach ($rows as $row) if (AlumnusController::hasNonNull($row))
             {
                 //$row[7] contains the faculties
                 //$row[8] contains the majors
@@ -725,3 +736,4 @@ class AlumnusController extends Controller
 
     }
 }
+
