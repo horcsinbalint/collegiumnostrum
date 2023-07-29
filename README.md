@@ -18,4 +18,5 @@ FORWARD_DB_PORT=33066
 - Run `./vendor/bin/sail up`.
 - Open another terminal and run `./vendor/bin/sail artisan migrate:fresh --seed`. (Other Artisan commands need to be executed similarly.)
 - Now you can test the site at `http://localhost:8080`.
-- To access MySQL, run `docker exec -it collegiumnostrum-mysql-1 mysql --user=collegiumnostrum --password collegiumnostrum` (change the container name, the username and the database name if needed; the latter two are in .env) and log in with the password (also found in .env).
+- Instead of SSH, you can use `docker exec -it collegiumnostrum-laravel.test-1 bash`.
+- And to access MySQL, run `docker exec -it collegiumnostrum-mysql-1 mysql --user=collegiumnostrum --password collegiumnostrum` (change the container name, the username and the database name if needed; the latter two are in .env) and log in with the password (also found in .env).
