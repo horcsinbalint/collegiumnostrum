@@ -34,7 +34,7 @@ class AlumnusController extends Controller
             $idsHavingDraftPairs = DB::table('alumni')->where('is_draft', false)->whereNotNull('pair_id')->pluck('id');
 
             return view('alumni.index', [
-                'alumni' => \App\Models\Alumnus::whereNotIn('id', $idsHavingDraftPairs)->paginate(10),
+                'alumni' => \App\Models\Alumnus::whereNotIn('id', $idsHavingDraftPairs)->orderBy('name')->paginate(12),
                 'majors_enum' => Major::$majors_enum,
                 'further_courses_enum' => FurtherCourse::$further_courses_enum,
                 'scientific_degrees_enum' => ScientificDegree::$scientific_degrees_enum,
@@ -42,7 +42,7 @@ class AlumnusController extends Controller
             ]);
         } else {
             return view('alumni.index', [
-                'alumni' => \App\Models\Alumnus::where('is_draft', false)->paginate(10),
+                'alumni' => \App\Models\Alumnus::where('is_draft', false)->orderBy('name')->paginate(12),
                 'majors_enum' => Major::$majors_enum,
                 'further_courses_enum' => FurtherCourse::$further_courses_enum,
                 'scientific_degrees_enum' => ScientificDegree::$scientific_degrees_enum,

@@ -16,9 +16,11 @@
     </title>
 
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @if (config('app.debug', 'false'))
     <style>
-
+            .top-bar {background-color: #dd0000;}
     </style>
+    @endif
     <link rel="icon" type="image/x-icon" href="https://eotvos.elte.hu/media/da/30/e9a7dd3606d1cf1b44a674b6b3f4d7b52638a8a0cdc56526c14c0010e4c0/ec_logo.png">
 </head>
 <body>
@@ -28,10 +30,10 @@
         <a href="/">
             <img class="header-banner-image" src="/images/eotvoscoll-nagy.svg" alt="ugrás a főoldalra"><img src="https://eotvos.elte.hu/media/da/30/e9a7dd3606d1cf1b44a674b6b3f4d7b52638a8a0cdc56526c14c0010e4c0/ec_logo.png" class="header-banner-image">
         </div>
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm top-bar">
+        <nav class="navbar navbar-expand-md navbar-light shadow-sm top-bar">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('Collegium Nostrum', 'Collegium Nostrum') }}
+                    {{ config('app.name', 'Collegium Nostrum') }}
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>

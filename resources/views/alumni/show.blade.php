@@ -21,6 +21,7 @@
     @if (Session::has('alumnus_updated'))
         <div class="alert alert-success" role="alert">
             {{ Session::get('alumnus_updated') }} frissítve!
+                </ul>
         </div>
     @endif
 
@@ -69,53 +70,41 @@
             <div class="mb-2">
 
                 <h2>Általános adatok</h2>
+                <ul>
 
                 @isset($alumnus->birth_date)
-                    <p class="text mb-0">
-                        <i class="fas fa-user"></i>
-                        <span>Születési idő: {{ $alumnus->birth_date }}</span>
-                    </p>
+                    <li>Születési idő: {{ $alumnus->birth_date }}</li>
                 @endisset
 
                 @isset($alumnus->birth_place)
-                    <p class="text mb-0">
-                        <i class="fas fa-user"></i>
-                        <span>Hely: {{ $alumnus->birth_place }}</span>
-                    </p>
+                    <li>Hely: {{ $alumnus->birth_place }}</li>
                 @endisset
 
                 @isset($alumnus->high_school)
-                    <p class="text mb-0">
-                        <i class="fas fa-user"></i>
-                        <span>Középiskola: {{ $alumnus->high_school }}</span>
-                    </p>
+                    <li>Középiskola: {{ $alumnus->high_school }}</li>
                 @endisset
 
                 @isset($alumnus->graduation_date)
-                    <p class="text mb-0">
-                        <i class="fas fa-user"></i>
-                        <span>Érettségi éve: {{ $alumnus->graduation_date }}</span>
-                    </p>
+                    <li>Érettségi éve: {{ $alumnus->graduation_date }}</li>
                 @endisset
+                </ul>
             </div>
             @endif
 
             @if($alumnus->university_faculties()->exists() or $alumnus->majors()->exists())
             <div class="mb-2">
                 <h2>Egyetemi adatok</h2>
+                <ul>
                 @if($alumnus->university_faculties()->exists() and $alumnus->agreed)
                     @php
                         $university_faculties_array = Arr::flatten($alumnus->university_faculties()->select('name')->get()->makeHIdden('pivot')->toArray());
                     @endphp
 
-                    <p class="text mb-0">
-                        <i class="fas fa-user"></i>
-                        @if(count($university_faculties_array) > 1)
-                        <span>Egyetemi karok: {{ implode(", ", $university_faculties_array) }}</span>
-                        @else
-                        <span>Egyetemi kar: {{ implode(", ", $university_faculties_array) }}</h3></span>
-                        @endif
-                    </p>
+                    @if(count($university_faculties_array) > 1)
+                    <li>Egyetemi karok: {{ implode(", ", $university_faculties_array) }}</li>
+                    @else
+                    <li>Egyetemi kar: {{ implode(", ", $university_faculties_array) }}</li>
+                    @endif
 
                 @endif
 
@@ -124,68 +113,53 @@
                         $majors_array = Arr::flatten($alumnus->majors()->select('name')->get()->makeHIdden('pivot')->toArray());
                     @endphp
 
-                    <p class="text mb-0">
-                        <i class="fas fa-user"></i>
-                        @if(count($majors_array) > 1)
-                        <span>Egyetemi szakok: {{ implode(", ", $majors_array) }}</span>
-                        @else
-                        <span>Egyetemi szak: {{ implode(", ", $majors_array) }}</h3></span>
-                        @endif
-                    </p>
+                    @if(count($majors_array) > 1)
+                    <li>Egyetemi szakok: {{ implode(", ", $majors_array) }}</li>
+                    @else
+                    <li>Egyetemi szak: {{ implode(", ", $majors_array) }}</li>
+                    @endif
                 @endif
+                </ul>
             </div>
             @endif
 
             @if($alumnus->further_courses()->exists() or isset($alumnus->further_course_detailed) or $alumnus->scientific_degrees()->exists() or $alumnus->research_fields()->exists() or isset($alumnus->start_of_membership) or isset($alumnus->recognations) or isset($alumnus->research_field_detailed) or isset($alumnus->links) or isset($alumnus->works))
             <div class="mb-2">
                 <h2>Pályafutás</h2>
+                <ul>
                 @if($alumnus->further_courses()->exists() and $alumnus->agreed)
                     @php
                         $further_courses_array = Arr::flatten($alumnus->further_courses()->select('name')->get()->makeHIdden('pivot')->toArray());
                     @endphp
 
-                    <p class="text mb-0">
-                        <i class="fas fa-user"></i>
-                        <span>Egyetem utáni pálya: {{ implode(", ", $further_courses_array) }}</span>
-                    </p>
+                    <li>Egyetem utáni pálya: {{ implode(", ", $further_courses_array) }}</li>
                 @endif
 
                 @isset($alumnus->further_course_detailed)
                 @if($alumnus->agreed)
-                    <p class="text mb-0">
-                    <i class="fas fa-user"></i>
+                    <ul><li><i>
                         {!! nl2br(e($alumnus->further_course_detailed)) !!}
-                    </p>
+                    </i></li></ul>
                 @endif
                 @endisset
 
                 @if($alumnus->scientific_degrees()->exists() and $alumnus->agreed)
-                    <p class="text mb-0">
-                        <i class="fas fa-user"></i>
-                        <span>Tudományos fokozat:</span>
-                    </p>
-                    @foreach ($alumnus->scientific_degrees as $degree)
-                    <p class="text mb-0">
-                        <i class="fas fa-user"></i>
-                        <span>{{ $degree->name . (isset($degree->obtain_year) ? " (" . $degree->obtain_year . ")" : "") }}</span>
-                    </p>
-                    @endforeach
+                    <li>Tudományos fokozat:</li>
+                    <ul>
+                        @foreach ($alumnus->scientific_degrees as $degree)
+                        <li>{{ $degree->name . (isset($degree->obtain_year) ? " (" . $degree->obtain_year . ")" : "") }}</li>
+                        @endforeach
+                    </ul>
                 @endif
 
                 @isset($alumnus->start_of_membership)
-                    <p class="text mb-0">
-                    <i class="fas fa-user"></i>
-                    <span>Collegiumi tagság kezdete: {{ $alumnus->start_of_membership }}</span>
-                    </p>
+                    <li>Collegiumi tagság kezdete: {{ $alumnus->start_of_membership }}</li>
 
                 @endisset
 
                 @isset($alumnus->recognations)
                 @if($alumnus->agreed)
-                    <p class="text mb-0">
-                    <i class="fas fa-user"></i>
-                    <span>Elismerések: {{ $alumnus->recognations }}</span>
-                    </p>
+                    <li>Elismerések: {{ $alumnus->recognations }}</li>
                     @endif
                 @endisset
 
@@ -194,40 +168,35 @@
                         $research_fields_array = Arr::flatten($alumnus->research_fields()->select('name')->get()->makeHIdden('pivot')->toArray());
                     @endphp
 
-                    <p class="text mb-0">
-                        <i class="fas fa-user"></i>
-                        <span>Kutatási terület: {{ implode(", ", $research_fields_array) }}</span>
-                    </p>
+                    <li>Kutatási terület: {{ implode(", ", $research_fields_array) }}</li>
                 @endif
 
                 @isset($alumnus->research_field_detailed )
                 @if($alumnus->agreed)
-                    <p class="text mb-0">
-                    <i class="fas fa-user"></i>
+                    <ul><li><i>
                         {!! nl2br(e($alumnus->research_field_detailed)) !!}
-                    </p>
+                    </i></li></ul>
                     @endif
                 @endisset
 
                 @isset($alumnus->links )
                 @if($alumnus->agreed)
-                    <p class="text mb-0">
-                    <i class="fas fa-user"></i>
-                    MTMT hivatkozás vagy saját honlap/Wikipédia-szócikk:
-                        {!! nl2br(e($alumnus->links)) !!}
-                    </p>
+                    <li>
+                        Wikipédia-szócikk:
+                        <code>{!! nl2br(e($alumnus->links)) !!}</code>
+                    </li>
                     @endif
                 @endisset
 
                 @isset($alumnus->works )
                 @if($alumnus->agreed)
-                    <p class="text mb-0">
-                    <i class="fas fa-user"></i>
+                    <li>
                         Főbb művek:
                         {!! nl2br(e($alumnus->works)) !!}
-                    </p>
+                    </li>
                     @endif
                 @endisset
+                </ul>
             </div>
             @endif
 
