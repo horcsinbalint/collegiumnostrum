@@ -15,6 +15,7 @@ Maybe I have finally found a way that works:D at least under **Ubuntu 20.04**.
 APP_PORT=8080
 FORWARD_DB_PORT=33066
 ```
+- In `.env`, rewrite `DB_HOST` from the given IP to `mysql`.
 - Run `./vendor/bin/sail up`.
 - Open another terminal and run `./vendor/bin/sail artisan migrate:fresh --seed`. (Other Artisan commands need to be executed similarly.)
 - Now you can test the site at `http://localhost:8080`.
