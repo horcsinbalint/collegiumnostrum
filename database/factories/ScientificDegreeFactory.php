@@ -18,7 +18,6 @@ class ScientificDegreeFactory extends Factory
     {
         return [
             'name' => fake()->word(),
-            'obtain_year' => fake()->date('Y'),
         ];
     }
 }

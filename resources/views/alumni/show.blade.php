@@ -146,7 +146,8 @@
                     <li>Tudományos fokozat:</li>
                     <ul>
                         @foreach ($alumnus->scientific_degrees as $degree)
-                        <li>{{ $degree->name . (isset($degree->obtain_year) ? " (" . $degree->obtain_year . ")" : "") }}</li>
+                        {{-- we retrieve the year from the connection table --}}
+                        <li>{{ $degree->name . (isset($degree->pivot->year) ? " (" . $degree->pivot->year . ")" : "") }}</li>
                         @endforeach
                     </ul>
                 @endif

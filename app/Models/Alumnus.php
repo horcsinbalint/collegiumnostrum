@@ -33,7 +33,8 @@ class Alumnus extends Model
     }
     public function scientific_degrees()
     {
-        return $this->belongsToMany(ScientificDegree::class)->withTimestamps();
+        //we should be able to access the year too
+        return $this->belongsToMany(ScientificDegree::class)->withPivot('year')->withTimestamps();
     }
     public function research_fields()
     {
@@ -42,6 +43,17 @@ class Alumnus extends Model
     public function university_faculties()
     {
         return $this->belongsToMany(UniversityFaculty::class)->withTimestamps();
+    }
+
+    /**
+     * Returns the year when the alumnus obtained a degree identified by name,
+     * or null if the degree is not found or if there is no year given.
+     */
+    public function scientific_degree_year(string $degree_name): ?int
+    {
+        $degree = $this->scientific_degrees()->where('name', $degree_name)->first();
+        if (is_null($degree)) return null;
+        else return $degree->pivot->year;
     }
 
     /**

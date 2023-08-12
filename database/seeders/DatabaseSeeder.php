@@ -65,10 +65,21 @@ class DatabaseSeeder extends Seeder
                 $further_courses->random(rand(1,4))
             );
 
-            // Add scientific degree
-            $alumnus->scientific_degrees()->sync(
-                $scientific_degrees->random(rand(1,4))
-            );
+            // Add scientific degree with random year
+            $degree_cnt = rand(1,4);
+            $degree_ids = $scientific_degrees->random($degree_cnt);
+            $years = collect(range(1990, 2010))
+                        ->map(function (int $year) {
+                            //this way there are also going to be nulls
+                            return ($year < 2000) ? null : $year;
+                        })
+                        ->random($degree_cnt);
+            for ($i=0; $i<$degree_cnt; ++$i) {
+                $alumnus->scientific_degrees()->attach(
+                    $degree_ids[$i],
+                    ['year' => $years[$i]]
+                );
+            }
 
             // Add research field
             $alumnus->research_fields()->sync(

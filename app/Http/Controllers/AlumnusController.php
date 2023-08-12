@@ -264,22 +264,18 @@ class AlumnusController extends Controller
 
         // Scientific degree
         if (isset($validated["scientific_degrees"])) {
-            $ids = [];
-            foreach ($validated["scientific_degrees"] as $scientific_degree) {
-                $degree = ScientificDegree::factory()->create([
-                    'name' => $scientific_degree,
-                    'obtain_year' => (
-                            isset($validated['doctor_year']) && strcmp($scientific_degree, 'egyetemi doktor') == 0 ? $validated['doctor_year'] :
-                            (isset($validated['candidate_year']) && strcmp($scientific_degree, 'kandidátus') == 0 ? $validated['candidate_year'] :
-                            (isset($validated['mta_year']) && strcmp($scientific_degree, 'tudományok doktora/MTA doktora') == 0 ? $validated['mta_year'] :
-                            (isset($validated['hab_year']) && strcmp($scientific_degree, 'habilitáció') == 0 ? $validated['hab_year'] :
-                            (isset($validated['phd_year']) && strcmp($scientific_degree, 'PhD') == 0 ? $validated['phd_year'] :
-                            (isset($validated['dla_year']) && strcmp($scientific_degree, 'DLA') == 0 ? $validated['dla_year'] : null)))))
-                        )
-                ]);
-                array_push($ids,$degree->id);
+            foreach ($validated["scientific_degrees"] as $degree_name) {
+                // here we assume we only choose from the pre-defined degrees (hence firstOrFail)
+                $degree = ScientificDegree::where('name', $degree_name)->firstOrFail();
+                $alumnus->scientific_degrees()->sync([$degree->id => ['year' =>
+                    isset($validated['doctor_year']) && strcmp($degree_name, 'egyetemi doktor') == 0 ? $validated['doctor_year'] :
+                    (isset($validated['candidate_year']) && strcmp($degree_name, 'kandidátus') == 0 ? $validated['candidate_year'] :
+                    (isset($validated['mta_year']) && strcmp($degree_name, 'tudományok doktora/MTA doktora') == 0 ? $validated['mta_year'] :
+                    (isset($validated['hab_year']) && strcmp($degree_name, 'habilitáció') == 0 ? $validated['hab_year'] :
+                    (isset($validated['phd_year']) && strcmp($degree_name, 'PhD') == 0 ? $validated['phd_year'] :
+                    (isset($validated['dla_year']) && strcmp($degree_name, 'DLA') == 0 ? $validated['dla_year'] : null)))))
+                ]]);
             }
-            $alumnus->scientific_degrees()->sync($ids);
         }
 
         // Research fields
@@ -367,6 +363,18 @@ class AlumnusController extends Controller
         }
         return false;
     }
+
+    /**
+     * Maps a degree name to the corresponding index in the worksheet.
+     */
+    const DEGREE_NAME_TO_INDEX = [
+        'egyetemi doktor' => 12,
+        'kandidátus' => 13,
+        'tudományok doktora/MTA doktora' => 14,
+        'PhD' => 15,
+        'habilitáció' => 16,
+        'DLA' => 17,
+    ];
 
     /**
      * Handles a request with an uploaded worksheet file that contains more than one alumni.
@@ -496,26 +504,43 @@ class AlumnusController extends Controller
                         'research_field_id' => $id,
                     ]);
                 }
-                /*
-                TODO
-                //this has to be done separately, since there is the year stored in the ScientificDegree
-                //maybe once in the connection table...
-                //until then, a new one for every instance
-                foreach (array_map('trim', explode(';',explode($separator, $longstring))) as $degreename)
-                {
-                    if ($degreename != '') {
-                        $id = ScientificDegree::create([
-                            'name' => $degreename,
-                            'obtain_year' =>
-                        ])->id;
 
+                // We have to add a degree to the list of degrees if the corresponding year is given.
+                // (Often, the year is filled in but the degree is not listed.)
+                $degree_names = $row[11];
+                $index_to_degree_name = array_flip(AlumnusController::DEGREE_NAME_TO_INDEX);
+                for ($i=12; $i<=17; ++$i) {
+                    if (!is_null($row[$i])) {
+                        $degree_name = $index_to_degree_name[$i];
+                        if (!str_contains($degree_names, $degree_name)) {
+                            $degree_names .= ";" . $degree_name;
+                        }
+                    }
+                }
+                foreach (AlumnusController::ids_from_string(';',$degree_names,'scientific_degrees') as $tuple)
+                {
+                    if ($tuple[0]) {
+                        $degree = ScientificDegree::find($tuple[1]);
+                    } else {
+                        $degree = ScientificDegree::create([
+                            'name' => $tuple[1],
+                        ]);
+                    }
+                    if (array_key_exists($degree->name, AlumnusController::DEGREE_NAME_TO_INDEX)) {
+                        $year = $row[ AlumnusController::DEGREE_NAME_TO_INDEX[$degree->name] ];
+                        //check whether this is null?
                         DB::table('alumnus_scientific_degree')->insert([
                             'alumnus_id' => $alumnus->id,
-                            'scientific_degree_id' => $id,
+                            'scientific_degree_id' => $degree->id,
+                            'year' => $year,
+                        ]);
+                    } else { //for an unknown
+                        DB::table('alumnus_scientific_degree')->insert([
+                            'alumnus_id' => $alumnus->id,
+                            'scientific_degree_id' => $degree->id,
                         ]);
                     }
                 }
-                */
             }
 
             --$len;
@@ -592,23 +617,20 @@ class AlumnusController extends Controller
         }
 
         // Scientific degree
+        $alumnus->scientific_degrees()->detach(); //first detaching everything
         if (isset($validated["scientific_degrees"])) {
-            $ids = [];
-            foreach ($validated["scientific_degrees"] as $scientific_degree) {
-                $degree = ScientificDegree::factory()->create([
-                    'name' => $scientific_degree,
-                    'obtain_year' => (
-                            isset($validated['doctor_year']) && strcmp($scientific_degree, 'egyetemi doktor') == 0 ? $validated['doctor_year'] :
-                            (isset($validated['candidate_year']) && strcmp($scientific_degree, 'kandidátus') == 0 ? $validated['candidate_year'] :
-                            (isset($validated['mta_year']) && strcmp($scientific_degree, 'tudományok doktora/MTA doktora') == 0 ? $validated['mta_year'] :
-                            (isset($validated['hab_year']) && strcmp($scientific_degree, 'habilitáció') == 0 ? $validated['hab_year'] :
-                            (isset($validated['phd_year']) && strcmp($scientific_degree, 'PhD') == 0 ? $validated['phd_year'] :
-                            (isset($validated['dla_year']) && strcmp($scientific_degree, 'DLA') == 0 ? $validated['dla_year'] : null)))))
-                        )
-                ]);
-                array_push($ids,$degree->id);
+            foreach ($validated["scientific_degrees"] as $degree_name) {
+                // here we assume we only choose from the pre-defined degrees (hence firstOrFail)
+                $degree = ScientificDegree::where('name', $degree_name)->firstOrFail();
+                $alumnus->scientific_degrees()->attach([$degree->id => ['year' =>
+                    isset($validated['doctor_year']) && strcmp($degree_name, 'egyetemi doktor') == 0 ? $validated['doctor_year'] :
+                    (isset($validated['candidate_year']) && strcmp($degree_name, 'kandidátus') == 0 ? $validated['candidate_year'] :
+                    (isset($validated['mta_year']) && strcmp($degree_name, 'tudományok doktora/MTA doktora') == 0 ? $validated['mta_year'] :
+                    (isset($validated['hab_year']) && strcmp($degree_name, 'habilitáció') == 0 ? $validated['hab_year'] :
+                    (isset($validated['phd_year']) && strcmp($degree_name, 'PhD') == 0 ? $validated['phd_year'] :
+                    (isset($validated['dla_year']) && strcmp($degree_name, 'DLA') == 0 ? $validated['dla_year'] : null)))))
+                ]]);
             }
-            $alumnus->scientific_degrees()->sync($ids);
         }
     }
 

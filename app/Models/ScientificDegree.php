@@ -11,7 +11,6 @@ class ScientificDegree extends Model
 
     protected $fillable=[
         'name',
-        'obtain_year',
     ];
 
     public static $scientific_degrees_enum = [
