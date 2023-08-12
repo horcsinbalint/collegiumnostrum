@@ -100,9 +100,9 @@ class AlumnusController extends Controller
         $user = Auth::user();
         if ($user && $user->can('create', Alumnus::class)) {
             $idsHavingDraftPairs = DB::table('alumni')->where('is_draft', false)->whereNotNull('pair_id')->pluck('id');
-            $alumni = $query->whereNotIn('id', $idsHavingDraftPairs)->paginate(10);
+            $alumni = $query->whereNotIn('id', $idsHavingDraftPairs)->orderBy('name')->paginate(12);
         } else {
-            $alumni = $query->where('is_draft', false)->paginate(10);
+            $alumni = $query->where('is_draft', false)->orderBy('name')->paginate(12);
         }
 
         return view('alumni.index', [
@@ -298,7 +298,8 @@ class AlumnusController extends Controller
         Session::flash('alumnus_created', $alumnus->name);
 
         if ($isDraft) {
-            return Redirect::route('alumni.index')->with('success','Az adatokat elmentettük; egy adminisztrátor jóváhagyása után lesznek elérhetőek. Köszönjük!');
+            return Redirect::route('alumni.index')
+                     ->with('success','Az adatokat elmentettük; egy adminisztrátor jóváhagyása után lesznek elérhetőek. Köszönjük!');
         } else {
             return Redirect::route('alumni.show', $alumnus);
         }
@@ -520,11 +521,11 @@ class AlumnusController extends Controller
             --$len;
             //for some reason this does not work
             return redirect()->route('alumni.index')
-                ->with('message', "Added $firstone and $len others");
+                ->with('message', "$firstone és $len másik alumnus hozzáadva");
         } else
         {
             return redirect()->back()
-                ->with('message', 'A feltöltött fájl nem tartalmaz alumnikat.');
+                ->with('message', 'A feltöltött fájl nem tartalmaz alumnusokat.');
         }
     }
 
