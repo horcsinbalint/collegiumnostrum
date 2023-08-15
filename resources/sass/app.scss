@@ -104,3 +104,13 @@ ul.pagination {
     background-color: $action-button;
     border-color: $action-button-hover;
 }
+
+/*For the welcome text.*/
+.welcome-box p, .welcome-box blockquote, .longer-text {
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: auto;
+}
+.welcome-box blockquote {
+    font-style: italic;
+}

@@ -21,7 +21,6 @@
     @if (Session::has('alumnus_updated'))
         <div class="alert alert-success" role="alert">
             {{ Session::get('alumnus_updated') }} frissítve!
-                </ul>
         </div>
     @endif
 
@@ -137,7 +136,7 @@
 
                 @isset($alumnus->further_course_detailed)
                 @if($alumnus->agreed)
-                    <ul><li><i>
+                    <ul><li class="longer-text"><i>
                         {!! nl2br(e($alumnus->further_course_detailed)) !!}
                     </i></li></ul>
                 @endif
@@ -173,7 +172,7 @@
 
                 @isset($alumnus->research_field_detailed )
                 @if($alumnus->agreed)
-                    <ul><li><i>
+                    <ul><li class="longer-text"><i>
                         {!! nl2br(e($alumnus->research_field_detailed)) !!}
                     </i></li></ul>
                     @endif
