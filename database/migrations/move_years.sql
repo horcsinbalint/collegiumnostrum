@@ -70,7 +70,23 @@ SELECT alumnus_scientific_degree.alumnus_id, alumnus_scientific_degree.scientifi
     WHERE scientific_degrees.id IN (select id from scientific_degrees where obtain_year is not null)
     ORDER BY alumnus_scientific_degree.scientific_degree_id;
 
+-- now merge the PR and do `git pull`
+
+-- merge degrees with a common name to one:
+-- WARNING: the ids might be different!
+-- e. g. the first id for 'PhD' was 4 here
+/*
+UPDATE alumnus_scientific_degree
+SET scientific_degree_id = 4
+WHERE scientific_degree_id IN (SELECT id FROM scientific_degrees WHERE name = 'PhD');
+*/
+
+-- similarly for the others (there are 7, I think)
 
 -- and when you're absolutely sure it's done:
+  -- deleting unnecessary duplicates:
+-- DELETE FROM scientific_degrees WHERE id NOT IN
+--   (SELECT scientific_degree_id FROM alumnus_scientific_degree);
+  -- and finally dropping the old column:
 -- ALTER TABLE scientific_degrees
 --   DROP COLUMN obtain_year;
