@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $alumni = \App\Models\Alumnus::factory(10)->create();
+        $alumni = \App\Models\Alumnus::factory(30)->create();
 
         foreach (\App\Models\Major::$majors_enum as $major) {
             \App\Models\Major::factory()->create([
@@ -60,7 +60,7 @@ class DatabaseSeeder extends Seeder
                 $majors->random(rand(1,4))
             );
 
-            // Add furthure course
+            // Add further course
             $alumnus->further_courses()->sync(
                 $further_courses->random(rand(1,4))
             );
