@@ -199,7 +199,7 @@
                                 array_filter(
                                     array_map(
                                         function($str) {return trim($str);},
-                                        explode('\n', $alumnus->works)
+                                        explode('<br />', nl2br($alumnus->works))
                                     ),
                                     function($str) {return !empty($str);}
                                 )
