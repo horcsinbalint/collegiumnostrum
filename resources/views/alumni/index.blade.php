@@ -41,7 +41,7 @@
                             Keresés
                         </div>
                         <div class="card-body">
-                        <form method="GET" action="{{ route('alumni.search') }}" enctype="multipart/form-data">
+                        <form id="search-form" method="GET" action="{{ route('alumni.search') }}" enctype="multipart/form-data">
                             @csrf
                             <input type="text" class="form-control" name="name" placeholder="Név" value="{{ isset($_GET['name']) ? $_GET['name'] : '' }}">
                             <input type="text" class="form-control" placeholder="Collegiumi tagság kezdete" pattern="\d{4}" maxlength="4" name="start_of_membership" value="{{ isset($_GET['start_of_membership']) ? $_GET['start_of_membership'] : '' }}">
@@ -93,7 +93,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary">Keresés</button>
+                            <div style="margin-top: 10px;">
+                                <button type="submit" class="btn btn-primary">Keresés</button>
+                                <button onclick="setFormCleanReset('#search-form');" class="btn btn-danger">Visszaállítás</button>
+                            </div>
                         </form>
 
                         </div>
@@ -125,10 +128,7 @@
                                 @endif
                                 <p class="small mb-0">
                                     @isset($alumnus->start_of_membership)
-                                    <span class="me-2">
-                                        <i class="fas fa-user"></i>
-                                        <span>Collegiumi tagság kezdete: {{ $alumnus->start_of_membership }}</span>
-                                    </span>
+                                    <span class="start-of-membership">Collegiumi tagság kezdete: <strong>{{ $alumnus->start_of_membership }}</strong></span>
                                     <br>
                                     @endisset
 
@@ -232,6 +232,24 @@
     for (var i = 0; i < links.length; i++) {
         if(links[i].href.includes("alumni/search?page=")){
             links[i].href += "&" + urlParams.toString();
+        }
+    }
+
+    // Clears a form's input fields.
+    // Based on https://stackoverflow.com/questions/40734855/reset-button-not-working-in-html-php.
+    function setFormCleanReset(formId) {
+        let formEl = document.querySelector(formId);
+    
+        // Iterate all non-hidden fields, set values to ''
+        for(const fieldEl of formEl.querySelectorAll('input:not([type=hidden])')) {
+
+            // @todo check input type and handle "select" etc.
+            fieldEl.setAttribute('value', '');
+        }
+
+        // For 'select' elements, we select the first option (the empty one).
+        for(const selectEl of formEl.querySelectorAll('select:not([type=hidden])')) {
+            selectEl.selectedIndex = 0;
         }
     }
 </script>
