@@ -349,7 +349,8 @@
         <div class="form-group row mb-3">
             <label for="doctor_year" class="col-sm-2 col-form-label">Egyetemi doktor tudományos fokozat megszerzésének éve</label>
             <div class="col-sm-10">
-                <input type="number" class="form-control @error('doctor_year') is-invalid @enderror" id="doctor_year" name="doctor_year" value="{{ old('doctor_year') }}">
+                <input type="number" class="form-control @error('doctor_year') is-invalid @enderror" id="doctor_year" name="doctor_year"
+                    value="{{ isset($alumnus) ? $alumnus->scientific_degree_year('egyetemi doktor') : null }}">
                 @error('doctor_year')
                     <div class="invalid-feedback">
                         {{ $message }}
@@ -361,7 +362,8 @@
         <div class="form-group row mb-3">
             <label for="candidate_year" class="col-sm-2 col-form-label">Kandidátus tudományos fokozat megszerzésének éve</label>
             <div class="col-sm-10">
-                <input type="number" class="form-control @error('candidate_year') is-invalid @enderror" id="candidate_year" name="candidate_year" value="{{ old('candidate_year') }}">
+                <input type="number" class="form-control @error('candidate_year') is-invalid @enderror" id="candidate_year" name="candidate_year"
+                    value="{{ isset($alumnus) ? $alumnus->scientific_degree_year('kandidátus') : null }}">
                 @error('candidate_year')
                     <div class="invalid-feedback">
                         {{ $message }}
@@ -373,7 +375,8 @@
         <div class="form-group row mb-3">
             <label for="mta_year" class="col-sm-2 col-form-label">Tudományok doktora/MTA doktora tudományos fokozat megszerzésének éve</label>
             <div class="col-sm-10">
-                <input type="number" class="form-control @error('mta_year') is-invalid @enderror" id="mta_year" name="mta_year" value="{{ old('mta_year') }}">
+                <input type="number" class="form-control @error('mta_year') is-invalid @enderror" id="mta_year" name="mta_year"
+                    value="{{ isset($alumnus) ? $alumnus->scientific_degree_year('tudományok doktora/MTA doktora') : null }}">
                 @error('mta_year')
                     <div class="invalid-feedback">
                         {{ $message }}
@@ -385,7 +388,8 @@
         <div class="form-group row mb-3">
             <label for="phd_year" class="col-sm-2 col-form-label">PhD tudományos fokozat megszerzésének éve</label>
             <div class="col-sm-10">
-                <input type="number" class="form-control @error('phd_year') is-invalid @enderror" id="phd_year" name="phd_year" value="{{ old('phd_year') }}">
+                <input type="number" class="form-control @error('phd_year') is-invalid @enderror" id="phd_year" name="phd_year"
+                    value="{{ isset($alumnus) ? $alumnus->scientific_degree_year('PhD') : null }}">
                 @error('phd_year')
                     <div class="invalid-feedback">
                         {{ $message }}
@@ -398,7 +402,8 @@
         <div class="form-group row mb-3">
             <label for="hab_year" class="col-sm-2 col-form-label">Habilitáció tudományos fokozat megszerzésének éve</label>
             <div class="col-sm-10">
-                <input type="number" class="form-control @error('hab_year') is-invalid @enderror" id="hab_year" name="hab_year" value="{{ old('hab_year') }}">
+                <input type="number" class="form-control @error('hab_year') is-invalid @enderror" id="hab_year" name="hab_year"
+                    value="{{ isset($alumnus) ? $alumnus->scientific_degree_year('habilitáció') : null }}">
                 @error('hab_year')
                     <div class="invalid-feedback">
                         {{ $message }}
@@ -410,7 +415,8 @@
         <div class="form-group row mb-3">
             <label for="dla_year" class="col-sm-2 col-form-label">DLA tudományos fokozat megszerzésének éve</label>
             <div class="col-sm-10">
-                <input type="number" class="form-control @error('dla_year') is-invalid @enderror" id="dla_year" name="dla_year" value="{{ old('dla_year') }}">
+                <input type="number" class="form-control @error('dla_year') is-invalid @enderror" id="dla_year" name="dla_year"
+                    value="{{ isset($alumnus) ? $alumnus->scientific_degree_year('DLA') : null }}">
                 @error('dla_year')
                     <div class="invalid-feedback">
                         {{ $message }}
