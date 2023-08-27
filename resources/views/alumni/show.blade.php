@@ -192,7 +192,22 @@
                 @if($alumnus->agreed)
                     <li>
                         Főbb művek:
-                        {!! nl2br(e($alumnus->works)) !!}
+                        {{-- We break the long string by newlines;
+                            filtering out empty strings. --}}
+                        <ul>
+                            @foreach(
+                                array_filter(
+                                    array_map(
+                                        function($str) {return trim($str);},
+                                        explode('<br />', nl2br($alumnus->works))
+                                    ),
+                                    function($str) {return !empty($str);}
+                                )
+                                as $work
+                            )
+                            <li>{{$work}}</li>
+                            @endforeach
+                        </ul>
                     </li>
                     @endif
                 @endisset
