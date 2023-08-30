@@ -182,7 +182,7 @@
                 @isset($alumnus->links )
                 @if($alumnus->agreed)
                     <li>
-                        Wikipédia-szócikk:
+                        Linkek:
                         <code>{!! nl2br(e($alumnus->links)) !!}</code>
                     </li>
                     @endif
